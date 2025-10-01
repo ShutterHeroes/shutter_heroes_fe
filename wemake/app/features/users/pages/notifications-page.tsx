@@ -8,7 +8,7 @@ export const meta: Route.MetaFunction = () => {
 export default function NotificationsPage() {
   return (
     <div className="space-y-20">
-      <h1 className="text-4xl font-bold">알림</h1>
+      <h1 className="text-4xl font-bold font-brush">알림</h1>
       <div className="flex flex-col items-start gap-5">
         <NotificationCard
           avatarUrl="https://github.com/serranoarevalo.png"

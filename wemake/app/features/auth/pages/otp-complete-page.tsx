@@ -11,7 +11,7 @@ export default function OtpPage() {
     <div className="flex flex-col relative items-center justify-center h-full">
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold">Confirm OTP</h1>
+          <h1 className="text-2xl font-semibold font-brush">Confirm OTP</h1>
           <p className="text-sm text-muted-foreground">
             Enter the OTP code sent to your email address.
           </p>

@@ -20,7 +20,7 @@ export default function LeaderboardPage() {
       />
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <h2 className="text-3xl font-bold leading-tight tracking-tight">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight font-brush">
             일간 리더보드
           </h2>
           <p className="text-xl font-light text-foreground">
@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <h2 className="text-3xl font-bold leading-tight tracking-tight">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight font-brush">
             주간 리더보드
           </h2>
           <p className="text-xl font-light text-foreground">
@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <h2 className="text-3xl font-bold leading-tight tracking-tight">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight font-brush">
             월간 리더보드
           </h2>
           <p className="text-xl font-light text-foreground">
@@ -98,7 +98,7 @@ export default function LeaderboardPage() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <h2 className="text-3xl font-bold leading-tight tracking-tight">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight font-brush">
             연간 리더보드
           </h2>
           <p className="text-xl font-light text-foreground">

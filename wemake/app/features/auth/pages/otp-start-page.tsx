@@ -12,7 +12,7 @@ export default function OtpStartPage() {
     <div className="flex flex-col relative items-center justify-center h-full">
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold">Log in with OTP</h1>
+          <h1 className="text-2xl font-semibold font-brush">Log in with OTP</h1>
           <p className="text-sm text-muted-foreground">
             We will send you a 4-digit code to log in to your account.
           </p>

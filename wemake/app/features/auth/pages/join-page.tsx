@@ -14,7 +14,7 @@ export default function JoinPage() {
         <Link to="/auth/login">로그인</Link>
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
-        <h1 className="text-2xl font-semibold">계정 만들기</h1>
+        <h1 className="text-2xl font-semibold font-brush">계정 만들기</h1>
         <Form className="w-full space-y-4">
           <InputPair
             label="이름"

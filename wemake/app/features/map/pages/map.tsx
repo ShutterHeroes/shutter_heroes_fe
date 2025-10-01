@@ -50,7 +50,7 @@ const HomePage: FC<NavigationProps> = ({ onNavigate }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
         <MapPin className="w-16 h-16 mx-auto mb-4 text-blue-600" />
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">Map Point Saver</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-4 font-brush">Map Point Saver</h1>
         <p className="text-gray-600 mb-8">Save and manage your favorite locations in South Korea on an interactive map</p>
         <div className="space-y-4">
           <button 
@@ -227,7 +227,7 @@ const MapPage: FC<MapContentProps> = ({ points, setPoints, onNavigate }) => {
             <Home className="w-5 h-5 mr-2" />
             <span className="font-semibold">Home</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-800">South Korea Map</h1>
+          <h1 className="text-xl font-bold text-gray-800 font-brush">South Korea Map</h1>
           <button 
             onClick={() => onNavigate('saved')}
             className="flex items-center text-purple-600 hover:text-purple-700"
@@ -256,7 +256,7 @@ const MapPage: FC<MapContentProps> = ({ points, setPoints, onNavigate }) => {
           {/* Save point form */}
           {tempMarker && (
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-              <h3 className="font-semibold text-gray-800 mb-2">Add a label for this point:</h3>
+              <h3 className="font-semibold text-gray-800 mb-2 font-brush">Add a label for this point:</h3>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -306,7 +306,7 @@ const SavedPointsPage: FC<MapContentProps> = ({ points, setPoints, onNavigate })
             <Home className="w-5 h-5 mr-2" />
             <span className="font-semibold">Home</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-800">Saved Points</h1>
+          <h1 className="text-xl font-bold text-gray-800 font-brush">Saved Points</h1>
           <button 
             onClick={() => onNavigate('map')}
             className="flex items-center text-green-600 hover:text-green-700"
@@ -319,7 +319,7 @@ const SavedPointsPage: FC<MapContentProps> = ({ points, setPoints, onNavigate })
 
       <div className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Saved Locations</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4 font-brush">Your Saved Locations</h2>
           
           {points.length === 0 ? (
             <div className="text-center py-12">

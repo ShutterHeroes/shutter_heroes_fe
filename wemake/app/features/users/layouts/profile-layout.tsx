@@ -27,7 +27,7 @@ export default function ProfileLayout() {
         </Avatar>
         <div className="space-y-5">
           <div className="flex gap-2">
-            <h1 className="text-2xl font-semibold">John Doe</h1>
+            <h1 className="text-2xl font-semibold font-brush">John Doe</h1>
             <Button variant="outline" asChild>
               <Link to="/my/settings">Edit profile</Link>
             </Button>

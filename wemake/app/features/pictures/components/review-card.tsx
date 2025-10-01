@@ -30,7 +30,7 @@ export function ReviewCard({
           <AvatarImage src={avatarUrl} />
         </Avatar>
         <div>
-          <h4 className="text-lg font-bold">{username}</h4>
+          <h4 className="text-lg font-bold font-brush">{username}</h4>
           <p className="text-sm text-muted-foreground">{handle}</p>
         </div>
       </div>

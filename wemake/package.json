@@ -33,6 +33,7 @@
     "isbot": "^5.1.27",
     "lucide-react": "^0.544.0",
     "luxon": "^3.7.2",
+    "motion": "^12.23.22",
     "postgres": "^3.4.7",
     "react": "^19.1.0",
     "react-day-picker": "^9.11.0",

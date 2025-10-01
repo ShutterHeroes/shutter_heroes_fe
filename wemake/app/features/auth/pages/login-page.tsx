@@ -14,7 +14,7 @@ export default function LoginPage() {
         <Link to="/auth/join">가입</Link>
       </Button>
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
-        <h1 className="text-2xl font-semibold">계정에 로그인하세요</h1>
+        <h1 className="text-2xl font-semibold font-brush">계정에 로그인하세요</h1>
         <Form className="w-full space-y-4">
           <InputPair
             label="이메일"

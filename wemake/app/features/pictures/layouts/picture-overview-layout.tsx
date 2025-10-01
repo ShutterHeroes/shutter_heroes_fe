@@ -11,7 +11,7 @@ export default function PictureOverviewLayout() {
         <div className="flex gap-10">
           <div className="size-40 rounded-xl shadow-xl bg-primary/50"></div>
           <div>
-            <h1 className="text-5xl font-bold">Picture Name</h1>
+            <h1 className="text-5xl font-bold font-brush">Picture Name</h1>
             <p className=" text-2xl font-light">Picture description</p>
             <div className="mt-5 flex items-center gap-2">
               <div className="flex text-yellow-400">

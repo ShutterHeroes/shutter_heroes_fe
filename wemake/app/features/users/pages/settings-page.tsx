@@ -23,7 +23,7 @@ export default function SettingsPage() {
     <div className="space-y-20">
       <div className="grid grid-cols-6 gap-40">
         <div className="col-span-4 flex flex-col gap-10">
-          <h2 className="text-2xl font-semibold">프로필 편집</h2>
+          <h2 className="text-2xl font-semibold font-brush">프로필 편집</h2>
           <Form className="flex flex-col w-1/2 gap-5">
             <InputPair
               label="이름"
