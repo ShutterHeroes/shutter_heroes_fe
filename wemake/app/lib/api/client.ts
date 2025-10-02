@@ -26,14 +26,8 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      // 인증 실패 시 로그인 페이지로 리다이렉트
-      // 현재 페이지가 이미 로그인/회원가입 페이지가 아닐 때만 리다이렉트
-      const currentPath = window.location.pathname;
-      if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/join')) {
-        window.location.href = '/auth/login';
-      }
-    }
+    // 401 에러는 각 컴포넌트에서 처리하도록 함
+    // 자동 리다이렉트하지 않음
     return Promise.reject(error);
   }
 );

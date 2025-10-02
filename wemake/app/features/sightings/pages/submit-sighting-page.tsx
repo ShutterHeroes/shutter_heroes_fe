@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { type MetaFunction, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +14,7 @@ import { Textarea } from '~/common/components/ui/textarea';
 import { Badge } from '~/common/components/ui/badge';
 import { Loader2, Sparkles } from 'lucide-react';
 import type { AnimalDetection } from '~/lib/types/ai.types';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 정보 등록 | 셔터 히어로즈' }];
@@ -28,11 +29,17 @@ type SubmitFormData = z.infer<typeof submitSchema>;
 
 export default function SubmitSightingPage() {
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [detections, setDetections] = useState<AnimalDetection[]>([]);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/auth/login');
+    }
+  }, [isLoading, user, navigate]);
 
   const {
     register,
@@ -98,9 +105,17 @@ export default function SubmitSightingPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto max-w-4xl space-y-6">
-      <h1 className="text-3xl font-bold">동물 목격 정보 등록</h1>
+        <h1 className="text-3xl font-bold">동물 목격 정보 등록</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* 이미지 업로드 */}
