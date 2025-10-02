@@ -37,6 +37,7 @@ import {
   UserIcon,
   MenuIcon,
   ChevronRightIcon,
+  Upload,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -125,6 +126,11 @@ export default function Navigation({
       {/* Right Side Actions */}
       {isLoggedIn ? (
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Submit Button */}
+          <Button asChild size="sm" className="hidden md:flex">
+            <Link to="/sightings/submit">등록하기</Link>
+          </Button>
+
           {/* Messages - Hidden on smallest screens */}
           <Button size="icon" variant="ghost" asChild className="relative hidden sm:flex">
             <Link to="/my/messages">
@@ -256,6 +262,14 @@ export default function Navigation({
 
                 {/* User Actions */}
                 <div className="flex flex-col gap-2">
+                  <Link
+                    to="/sightings/submit"
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent bg-primary text-primary-foreground"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Upload className="size-5" />
+                    <span>등록하기</span>
+                  </Link>
                   <Link
                     to="/my/sightings"
                     className="flex items-center gap-3 p-3 rounded-md hover:bg-accent"
