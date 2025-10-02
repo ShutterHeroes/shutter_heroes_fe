@@ -1,0 +1,37 @@
+import { Button } from "~/common/components/ui/button";
+import { Input } from "~/common/components/ui/input";
+import { Form, type MetaFunction } from "react-router";
+import InputPair from "~/common/components/input-pair";
+
+export const meta: MetaFunction = () => {
+  return [{ title: "Start OTP | Shutter Heroes" }];
+};
+
+export default function OtpStartPage() {
+  return (
+    <div className="flex flex-col relative items-center justify-center h-full">
+      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold font-brush">Log in with OTP</h1>
+          <p className="text-sm text-muted-foreground">
+            We will send you a 4-digit code to log in to your account.
+          </p>
+        </div>
+        <Form className="w-full space-y-4">
+          <InputPair
+            label="Email"
+            description="Enter your email address"
+            name="email"
+            id="email"
+            required
+            type="email"
+            placeholder="i.e shutterheroes@example.com"
+          />
+          <Button className="w-full" type="submit">
+            Send OTP
+          </Button>
+        </Form>
+      </div>
+    </div>
+  );
+}

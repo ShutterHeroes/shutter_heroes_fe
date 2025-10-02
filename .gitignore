@@ -1,2 +1,6 @@
-# idea file
+# IDE files
 /.idea
+.cursorrules
+
+# Claude Code
+/.claude
