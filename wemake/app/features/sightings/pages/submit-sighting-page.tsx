@@ -46,17 +46,23 @@ export default function SubmitSightingPage() {
     setSelectedImage(file);
     setError(null);
     setDetections([]);
+    setIsSubmitting(true);
 
-    // AI 동물 인식 자동 실행
-    setIsRecognizing(true);
     try {
-      const result = await aiApi.recognizeAnimal({ image: file });
-      setDetections(result.detections);
+      // 이미지 업로드와 동시에 Sighting 생성 (백엔드에서 Vision API 처리)
+      const sightingResult = await sightingsApi.create({
+        image: file,
+      });
+
+      // 백엔드 응답에서 AI 인식 결과 저장
+      setDetections(sightingResult.detections || []);
+
+      // 생성된 목격 정보 페이지로 이동
+      navigate(`/sightings/${sightingResult.sightingId}`);
     } catch (err: any) {
-      console.error('AI 인식 에러:', err);
-      // AI 실패해도 계속 진행 가능
-    } finally {
-      setIsRecognizing(false);
+      console.error('목격 정보 등록 에러:', err);
+      setError(err.response?.data?.message || '목격 정보 등록에 실패했습니다');
+      setIsSubmitting(false);
     }
   };
 

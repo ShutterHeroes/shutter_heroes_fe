@@ -19,8 +19,8 @@ export default [
   ...prefix("/sightings", [
     index("features/sightings/pages/sightings-page.tsx"),
     route("/submit", "features/sightings/pages/submit-sighting-page.tsx"),
+    route("/:sightingId", "features/sightings/pages/sighting-detail-page.tsx"),
     // route("/map", "features/sightings/pages/map-page.tsx"),
-    // route("/:sightingId", "features/sightings/pages/sighting-detail-page.tsx"),
   ]),
 
   // 사용자
