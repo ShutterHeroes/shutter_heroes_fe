@@ -3,7 +3,7 @@ import { type MetaFunction, Link } from 'react-router';
 import { useMyMedias } from '~/features/sightings/hooks/use-my-medias';
 import { MediaGrid } from '~/features/sightings/components/media-grid';
 import { Button } from '~/common/components/ui/button';
-import { useAuth } from '~/lib/hooks/use-auth.tsx';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
   return [{ title: '내 목격 정보 | 셔터 히어로즈' }];
