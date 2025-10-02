@@ -42,42 +42,12 @@ import { useState } from "react";
 
 const menus = [
   {
+    name: "목격 정보",
+    to: "/sightings",
+  },
+  {
     name: "사용자",
     to: "/users",
-  },
-  {
-    name: "사진제출",
-    to: "/picture-submit/submit-picture-page",
-  },
-  {
-    name: "지도",
-    to: "/map/map",
-  },
-  {
-    name: "검색",
-    description: "사진을 검색하세요",
-    to: "/pictures/search",
-  },
-  {
-    name: "사진",
-    to: "/pictures",
-    items: [
-      {
-        name: "리더보드",
-        description: "커뮤니티의 최고 성과자들을 확인하세요",
-        to: "/pictures/leaderboards",
-      },
-      {
-        name: "카테고리",
-        description: "커뮤니티의 최고 카테고리들을 확인하세요",
-        to: "/pictures/categories",
-      },
-      {
-        name: "홍보",
-        description: "커뮤니티에 사진을 홍보하세요",
-        to: "/pictures/promote",
-      },
-    ],
   },
 ];
 
@@ -182,9 +152,9 @@ export default function Navigation({
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/my/dashboard">
+                    <Link to="/my/sightings">
                       <BarChart3Icon className="size-4 mr-2" />
-                      대시보드
+                      내 목격 정보
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -287,12 +257,12 @@ export default function Navigation({
                 {/* User Actions */}
                 <div className="flex flex-col gap-2">
                   <Link
-                    to="/my/dashboard"
+                    to="/my/sightings"
                     className="flex items-center gap-3 p-3 rounded-md hover:bg-accent"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <BarChart3Icon className="size-5" />
-                    <span>대시보드</span>
+                    <span>내 목격 정보</span>
                   </Link>
                   <Link
                     to="/my/profile"

@@ -15,6 +15,14 @@ export default [
     route("/join", "features/auth/pages/join-page.tsx"),
   ]),
 
+  // 목격 정보
+  ...prefix("/sightings", [
+    index("features/sightings/pages/sightings-page.tsx"),
+    // route("/submit", "features/sightings/pages/submit-sighting-page.tsx"),
+    // route("/map", "features/sightings/pages/map-page.tsx"),
+    // route("/:sightingId", "features/sightings/pages/sighting-detail-page.tsx"),
+  ]),
+
   // 사용자
   ...prefix("/users", [
     index("features/users/pages/users-page.tsx"),
@@ -24,14 +32,7 @@ export default [
   // 마이페이지
   ...prefix("/my", [
     route("/profile", "features/users/pages/my-profile-page.tsx"),
+    route("/sightings", "features/users/pages/my-sightings-page.tsx"),
     route("/settings", "features/users/pages/settings-page.tsx"),
   ]),
-
-  // TODO: 이후 단계에서 추가할 라우트들
-  // ...prefix("/sightings", [
-  //   index("features/sightings/pages/sightings-page.tsx"),
-  //   route("/submit", "features/sightings/pages/submit-sighting-page.tsx"),
-  //   route("/map", "features/sightings/pages/map-page.tsx"),
-  //   route("/:sightingId", "features/sightings/pages/sighting-detail-page.tsx"),
-  // ]),
 ] satisfies RouteConfig;
