@@ -17,7 +17,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers(currentPage, 20, search);
-  }, [currentPage]);
+  }, [currentPage, fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

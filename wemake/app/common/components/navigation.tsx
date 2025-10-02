@@ -42,6 +42,10 @@ import { useState } from "react";
 
 const menus = [
   {
+    name: "사용자",
+    to: "/users",
+  },
+  {
     name: "사진제출",
     to: "/picture-submit/submit-picture-page",
   },
