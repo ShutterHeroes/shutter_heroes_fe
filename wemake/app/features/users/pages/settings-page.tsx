@@ -23,7 +23,7 @@ type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { isUpdating, error, updateProfile } = useMyProfile();
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -56,6 +56,14 @@ export default function SettingsPage() {
     await logout();
     navigate('/auth/login');
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

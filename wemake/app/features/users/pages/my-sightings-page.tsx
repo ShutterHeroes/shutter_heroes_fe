@@ -10,13 +10,21 @@ export const meta: MetaFunction = () => {
 };
 
 export default function MySightingsPage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { medias, isLoading, error, fetchMyMedias } = useMyMedias();
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     fetchMyMedias({ page: currentPage, size: 20 });
   }, [currentPage, fetchMyMedias]);
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

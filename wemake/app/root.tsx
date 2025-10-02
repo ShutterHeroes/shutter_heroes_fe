@@ -50,7 +50,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function AppContent() {
   const { pathname } = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={pathname.includes("/auth/") ? "" : "py-28 px-5 lg:px-20"}>

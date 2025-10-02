@@ -30,12 +30,11 @@ export default function JoinPage() {
   };
 
   return (
-    <div className="flex flex-col relative items-center justify-center min-h-screen">
-      <Button variant="ghost" asChild className="absolute right-8 top-8">
-        <Link to="/auth/login">로그인</Link>
-      </Button>
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="flex items-center flex-col justify-center w-full max-w-md gap-10 p-8">
-        <h1 className="text-2xl font-semibold font-brush">계정 만들기</h1>
+        <Link to="/" className="text-2xl font-bold tracking-tighter hover:opacity-80 transition-opacity">
+          셔터 히어로즈
+        </Link>
 
         {error && (
           <div className="w-full p-3 bg-red-100 border border-red-400 text-red-700 rounded">
