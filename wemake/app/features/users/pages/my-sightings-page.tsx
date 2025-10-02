@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type MetaFunction } from 'react-router';
+import { type MetaFunction, Link } from 'react-router';
 import { useMyMedias } from '~/features/sightings/hooks/use-my-medias';
 import { MediaGrid } from '~/features/sightings/components/media-grid';
 import { Button } from '~/common/components/ui/button';
@@ -21,7 +21,12 @@ export default function MySightingsPage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-gray-500">로그인이 필요합니다</p>
+        <div className="text-center space-y-4">
+          <p className="text-gray-500">로그인이 필요합니다</p>
+          <Button asChild>
+            <Link to="/auth/login">로그인하기</Link>
+          </Button>
+        </div>
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type MetaFunction, useNavigate } from 'react-router';
+import { type MetaFunction, useNavigate, Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -60,7 +60,12 @@ export default function SettingsPage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-gray-500">로그인이 필요합니다</p>
+        <div className="text-center space-y-4">
+          <p className="text-gray-500">로그인이 필요합니다</p>
+          <Button asChild>
+            <Link to="/auth/login">로그인하기</Link>
+          </Button>
+        </div>
       </div>
     );
   }

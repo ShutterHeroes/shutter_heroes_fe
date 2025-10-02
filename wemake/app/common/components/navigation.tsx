@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Separator } from "~/common/components/ui/separator";
 import {
   NavigationMenu,
@@ -40,6 +40,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "~/lib/hooks/use-auth";
 
 const menus = [
   {
@@ -62,6 +63,13 @@ export default function Navigation({
   hasMessages: boolean;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   return (
     <nav className="flex px-4 md:px-8 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50 border-b">
@@ -152,8 +160,8 @@ export default function Navigation({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="flex flex-col">
-                  <span className="font-medium">홍길동</span>
-                  <span className="text-xs text-muted-foreground">@사용자명</span>
+                  <span className="font-medium">{user?.nickname || '사용자'}</span>
+                  <span className="text-xs text-muted-foreground">@{user?.username || 'username'}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -177,11 +185,9 @@ export default function Navigation({
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/auth/logout">
-                    <LogOutIcon className="size-4 mr-2" />
-                    로그아웃
-                  </Link>
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <LogOutIcon className="size-4 mr-2" />
+                  로그아웃
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -203,11 +209,11 @@ export default function Navigation({
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <Avatar>
                     <AvatarImage src="/logo.png" />
-                    <AvatarFallback>N</AvatarFallback>
+                    <AvatarFallback>{user?.nickname?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium">홍길동</span>
-                    <span className="text-xs text-muted-foreground">@사용자명</span>
+                    <span className="font-medium">{user?.nickname || '사용자'}</span>
+                    <span className="text-xs text-muted-foreground">@{user?.username || 'username'}</span>
                   </div>
                 </div>
 
@@ -294,14 +300,13 @@ export default function Navigation({
                     <SettingsIcon className="size-5" />
                     <span>설정</span>
                   </Link>
-                  <Link
-                    to="/auth/logout"
-                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent text-destructive"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent text-destructive w-full text-left"
+                    onClick={handleLogout}
                   >
                     <LogOutIcon className="size-5" />
                     <span>로그아웃</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </SheetContent>
