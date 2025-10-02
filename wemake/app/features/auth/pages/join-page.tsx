@@ -1,62 +1,112 @@
 import { Button } from "~/common/components/ui/button";
-import { Form, Link, type MetaFunction } from "react-router";
-import InputPair from "~/common/components/input-pair";
-import AuthButtons from "../components/auth-buttons";
+import { Link, type MetaFunction } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterFormData } from "../schema";
+import { useRegister } from "../hooks/use-register";
+import { Label } from "~/common/components/ui/label";
+import { Input } from "~/common/components/ui/input";
 
 export const meta: MetaFunction = () => {
   return [{ title: "가입 | 셔터 히어로즈" }];
 };
 
 export default function JoinPage() {
+  const { register: registerUser, isLoading, error } = useRegister();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
+    await registerUser({
+      email: data.email,
+      password: data.password,
+      displayName: data.displayName,
+    });
+  };
+
   return (
-    <div className="flex flex-col relative items-center justify-center h-full">
-      <Button variant={"ghost"} asChild className="absolute right-8 top-8 ">
+    <div className="flex flex-col relative items-center justify-center min-h-screen">
+      <Button variant="ghost" asChild className="absolute right-8 top-8">
         <Link to="/auth/login">로그인</Link>
       </Button>
-      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10">
+      <div className="flex items-center flex-col justify-center w-full max-w-md gap-10 p-8">
         <h1 className="text-2xl font-semibold font-brush">계정 만들기</h1>
-        <Form className="w-full space-y-4">
-          <InputPair
-            label="이름"
-            description="이름을 입력하세요"
-            name="name"
-            id="name"
-            required
-            type="text"
-            placeholder="이름을 입력하세요"
-          />
-          <InputPair
-            id="username"
-            label="사용자명"
-            description="사용자명을 입력하세요"
-            name="username"
-            required
-            type="text"
-            placeholder="예: shutterheroes"
-          />
-          <InputPair
-            id="email"
-            label="이메일"
-            description="이메일 주소를 입력하세요"
-            name="email"
-            required
-            type="email"
-            placeholder="예: shutterheroes@example.com"
-          />
-          <InputPair
-            id="password"
-            label="비밀번호"
-            description="비밀번호를 입력하세요"
-            name="password"
-            required
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-          />
-          <Button className="w-full" type="submit">
-            계정 만들기
+
+        {error && (
+          <div className="w-full p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">이메일 *</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="shutterheroes@example.com"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">비밀번호 *</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="최소 8자 이상"
+              {...register("password")}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-600">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="passwordConfirm">비밀번호 확인 *</Label>
+            <Input
+              id="passwordConfirm"
+              type="password"
+              placeholder="비밀번호를 다시 입력하세요"
+              {...register("passwordConfirm")}
+            />
+            {errors.passwordConfirm && (
+              <p className="text-sm text-red-600">{errors.passwordConfirm.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="displayName">표시 이름 (선택)</Label>
+            <Input
+              id="displayName"
+              type="text"
+              placeholder="닉네임을 입력하세요"
+              {...register("displayName")}
+            />
+            {errors.displayName && (
+              <p className="text-sm text-red-600">{errors.displayName.message}</p>
+            )}
+          </div>
+
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? "처리 중..." : "계정 만들기"}
           </Button>
-        </Form>
-        <AuthButtons />
+        </form>
+
+        <p className="text-sm text-gray-600">
+          이미 계정이 있으신가요?{" "}
+          <Link to="/auth/login" className="text-blue-600 hover:underline">
+            로그인
+          </Link>
+        </p>
       </div>
     </div>
   );
