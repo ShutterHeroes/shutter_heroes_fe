@@ -1,17 +1,16 @@
-import { type MetaFunction } from 'react-router';
-import { useAuth } from '~/lib/hooks/use-auth.tsx';
+import { useParams, type MetaFunction } from 'react-router';
+import { useUserProfile } from '../hooks/use-user-profile';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
 import { Avatar } from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
-import { Button } from '~/common/components/ui/button';
-import { Link } from 'react-router';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '내 프로필 | 셔터 히어로즈' }];
+  return [{ title: '사용자 프로필 | 셔터 히어로즈' }];
 };
 
-export default function MyProfilePage() {
-  const { user, isLoading } = useAuth();
+export default function UserProfilePage() {
+  const { userId } = useParams();
+  const { user, isLoading, error } = useUserProfile(userId!);
 
   if (isLoading) {
     return (
@@ -21,28 +20,16 @@ export default function MyProfilePage() {
     );
   }
 
-  if (!user) {
+  if (error || !user) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <p className="text-gray-500">로그인이 필요합니다</p>
-          <Button asChild>
-            <Link to="/auth/login">로그인하기</Link>
-          </Button>
-        </div>
+        <p className="text-red-500">{error || '사용자를 찾을 수 없습니다'}</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">내 프로필</h1>
-        <Button asChild variant="outline">
-          <Link to="/my/settings">설정</Link>
-        </Button>
-      </div>
-
+    <div className="container mx-auto max-w-2xl">
       <Card>
         <CardHeader>
           <div className="flex items-center gap-6">
@@ -57,7 +44,6 @@ export default function MyProfilePage() {
             </Avatar>
             <div className="flex-1">
               <CardTitle className="text-2xl">{user.displayName}</CardTitle>
-              <p className="text-gray-500">{user.email}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
                   {user.role}
@@ -78,23 +64,9 @@ export default function MyProfilePage() {
             </p>
           </div>
 
-          {user.lastLoginAt && (
-            <div>
-              <p className="text-sm text-gray-500">마지막 로그인</p>
-              <p className="font-medium">
-                {new Date(user.lastLoginAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-            </div>
-          )}
-
+          {/* TODO: Phase 3에서 사용자의 목격 정보 목록 추가 */}
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">내 목격 정보는 곧 추가될 예정입니다.</p>
+            <p className="text-sm text-gray-500">이 사용자의 목격 정보는 곧 추가될 예정입니다.</p>
           </div>
         </CardContent>
       </Card>

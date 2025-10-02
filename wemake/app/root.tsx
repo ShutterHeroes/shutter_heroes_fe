@@ -12,7 +12,7 @@ import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
 import Navigation from "./common/components/navigation";
 import { Settings } from "luxon";
-import { AuthProvider } from "./lib/hooks/use-auth.tsx";
+import { AuthProvider, useAuth } from "./lib/hooks/use-auth.tsx";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -48,20 +48,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function AppContent() {
   const { pathname } = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <div className={pathname.includes("/auth/") ? "" : "py-28 px-5 lg:px-20"}>
+      {pathname.includes("/auth") ? null : (
+        <Navigation
+          isLoggedIn={isAuthenticated}
+          hasNotifications={false}
+          hasMessages={false}
+        />
+      )}
+      <Outlet />
+    </div>
+  );
+}
+
+export default function App() {
   return (
     <AuthProvider>
-      <div className={pathname.includes("/auth/") ? "" : "py-28 px-5 lg:px-20"}>
-        {pathname.includes("/auth") ? null : (
-          <Navigation
-            isLoggedIn={true}
-            hasNotifications={false}
-            hasMessages={false}
-          />
-        )}
-        <Outlet />
-      </div>
+      <AppContent />
     </AuthProvider>
   );
 }

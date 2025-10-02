@@ -1,105 +1,143 @@
-import { Form } from "react-router";
-import type { Route } from "./+types/settings-page";
-import InputPair from "~/common/components/input-pair";
-import SelectPair from "~/common/components/select-pair";
-import { useState } from "react";
-import { Label } from "~/common/components/ui/label";
-import { Input } from "~/common/components/ui/input";
-import { Button } from "~/common/components/ui/button";
+import { useState } from 'react';
+import { type MetaFunction, useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useMyProfile } from '../hooks/use-my-profile';
+import { useAuth } from '~/lib/hooks/use-auth.tsx';
+import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
+import { Button } from '~/common/components/ui/button';
+import { Input } from '~/common/components/ui/input';
+import { Label } from '~/common/components/ui/label';
 
-export const meta: Route.MetaFunction = () => {
-  return [{ title: "설정 | 셔터 히어로즈" }];
+export const meta: MetaFunction = () => {
+  return [{ title: '설정 | 셔터 히어로즈' }];
 };
 
+const updateProfileSchema = z.object({
+  displayName: z.string().min(1, '표시 이름을 입력해주세요').optional(),
+  avatarUrl: z.string().url('올바른 URL 형식이 아닙니다').optional().or(z.literal('')),
+});
+
+type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+
 export default function SettingsPage() {
-  const [avatar, setAvatar] = useState<string | null>(null);
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file = event.target.files[0];
-      setAvatar(URL.createObjectURL(file));
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { isUpdating, error, updateProfile } = useMyProfile();
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdateProfileFormData>({
+    resolver: zodResolver(updateProfileSchema),
+    defaultValues: {
+      displayName: user?.displayName || '',
+      avatarUrl: user?.avatarUrl || '',
+    },
+  });
+
+  const onSubmit = async (data: UpdateProfileFormData) => {
+    setSuccessMessage('');
+    try {
+      await updateProfile({
+        displayName: data.displayName,
+        avatarUrl: data.avatarUrl || undefined,
+      });
+      setSuccessMessage('프로필이 성공적으로 수정되었습니다');
+    } catch (err) {
+      // Error handled in useMyProfile
     }
   };
-  return (
-    <div className="space-y-20">
-      <div className="grid grid-cols-6 gap-40">
-        <div className="col-span-4 flex flex-col gap-10">
-          <h2 className="text-2xl font-semibold font-brush">프로필 편집</h2>
-          <Form className="flex flex-col w-1/2 gap-5">
-            <InputPair
-              label="이름"
-              description="공개 이름"
-              required
-              id="name"
-              name="name"
-              placeholder="홍길동"
-            />
-            <SelectPair
-              label="역할"
-              description="가장 많이 동일시하는 역할은 무엇인가요"
-              name="role"
-              placeholder="역할 선택"
-              options={[
-                { label: "개발자", value: "developer" },
-                { label: "디자이너", value: "designer" },
-                { label: "제품 관리자", value: "product-manager" },
-                { label: "창업자", value: "founder" },
-                { label: "기타", value: "other" },
-              ]}
-            />
-            <InputPair
-              label="헤드라인"
-              description="프로필에 대한 소개입니다."
-              required
-              id="headline"
-              name="headline"
-              placeholder="홍길동"
-              textArea
-            />
-            <InputPair
-              label="소개"
-              description="공개 소개입니다. 프로필 페이지에 표시됩니다."
-              required
-              id="bio"
-              name="bio"
-              placeholder="홍길동"
-              textArea
-            />
-            <Button className="w-full">프로필 업데이트</Button>
-          </Form>
-        </div>
-        <aside className="col-span-2 p-6 rounded-lg border shadow-md">
-          <Label className="flex flex-col gap-1">
-            아바타
-            <small className="text-muted-foreground">
-              공개 아바타입니다.
-            </small>
-          </Label>
-          <div className="space-y-5">
-            <div className="size-40 rounded-full shadow-xl overflow-hidden ">
-              {avatar ? (
-                <img src={avatar} className="object-cover w-full h-full" />
-              ) : null}
-            </div>
-            <Input
-              type="file"
-              className="w-1/2"
-              onChange={onChange}
-              required
-              name="icon"
-            />
-            <div className="flex flex-col text-xs">
-              <span className=" text-muted-foreground">
-                권장 크기: 128x128px
-              </span>
-              <span className=" text-muted-foreground">
-                허용 형식: PNG, JPEG
-              </span>
-              <span className=" text-muted-foreground">최대 파일 크기: 1MB</span>
-            </div>
-            <Button className="w-full">아바타 업데이트</Button>
-          </div>
-        </aside>
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/auth/login');
+  };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-gray-500">로그인이 필요합니다</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto max-w-2xl space-y-6">
+      <h1 className="text-3xl font-bold">설정</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>프로필 정보</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              {successMessage}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">이메일 (변경 불가)</Label>
+              <Input id="email" type="email" value={user.email} disabled />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="displayName">표시 이름</Label>
+              <Input
+                id="displayName"
+                type="text"
+                placeholder="표시 이름을 입력하세요"
+                {...register('displayName')}
+              />
+              {errors.displayName && (
+                <p className="text-sm text-red-600">{errors.displayName.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="avatarUrl">프로필 이미지 URL</Label>
+              <Input
+                id="avatarUrl"
+                type="url"
+                placeholder="https://example.com/avatar.jpg"
+                {...register('avatarUrl')}
+              />
+              {errors.avatarUrl && (
+                <p className="text-sm text-red-600">{errors.avatarUrl.message}</p>
+              )}
+            </div>
+
+            <Button type="submit" disabled={isUpdating} className="w-full">
+              {isUpdating ? '저장 중...' : '프로필 수정'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>계정</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-500 mb-2">계정에서 로그아웃합니다</p>
+            <Button onClick={handleLogout} variant="destructive">
+              로그아웃
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
