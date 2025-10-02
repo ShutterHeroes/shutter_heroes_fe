@@ -474,51 +474,77 @@ export const sightingsApi = {
 
 ---
 
-### 3.7 Phase 7: 지도 기능 (1-2일)
+### 3.7 Phase 7: 홈페이지 업데이트 (1일) ✅ 완료
 
-**우선순위: 하**
+**우선순위: 중**
 
 #### 구현 항목
-1. ✅ 전체 Sighting 지도 표시
-2. ✅ 마커 클릭 시 상세 정보
-3. ✅ Leaflet 또는 Kakao Map 연동
+1. ✅ 홈페이지 디자인 (Hero Section)
+2. ✅ Features Section (AI 인식, 커뮤니티, 데이터 축적)
+3. ✅ 최근 목격 정보 섹션
+4. ✅ CTA Section
+5. ✅ 네비게이션 메뉴 수정 (등록하기 버튼 추가)
 
 #### 구현 파일
-- `app/features/sightings/pages/map-page.tsx`
-- `app/features/sightings/components/sightings-map.tsx`
+- ✅ `app/common/pages/home-page.tsx` - 전면 재구성
+- ✅ `app/common/components/navigation.tsx` - 등록하기 버튼 추가
 
 ---
 
-### 3.8 Phase 8: 홈페이지 및 네비게이션 (1일)
+### 3.8 Phase 8: 프로젝트 정리 ✅ 완료
 
-**우선순위: 하**
+**우선순위: 필수**
 
-#### 구현 항목
-1. ✅ 홈페이지 디자인 (최근 Sightings)
-2. ✅ 네비게이션 메뉴 수정
-3. ✅ 인증 상태에 따른 메뉴 표시
-
-#### 구현 파일
-- `app/common/pages/home-page.tsx`
-- `app/common/components/navigation.tsx`
+#### 삭제된 파일
+- ✅ `app/features/pictures/` - 전체 삭제
+- ✅ `app/features/map/` - 전체 삭제 (추후 재구현 예정)
+- ✅ `app/features/users/layouts/dashboard-layout.tsx`
+- ✅ `app/features/users/layouts/messages-layout.tsx`
+- ✅ `app/features/users/pages/dashboard*.tsx`
+- ✅ `app/features/users/pages/message*.tsx`
+- ✅ `app/features/users/pages/notifications-page.tsx`
+- ✅ `app/features/auth/layouts/` - 전체 삭제
+- ✅ `app/features/auth/pages/otp*.tsx`
+- ✅ `app/features/auth/pages/social*.tsx`
 
 ---
 
-## 📝 4단계: 제거할 파일 목록
+### 3.9 Phase 9: 향후 구현 예정 기능
 
-### 완전 삭제
+**우선순위: 낮음**
+
+#### 지도 기능
+1. ⏳ 전체 Sighting 지도 표시
+2. ⏳ 마커 클릭 시 상세 정보
+3. ⏳ Leaflet 또는 Kakao Map 연동
+
+#### 목격 정보 수정 기능
+1. ⏳ PATCH API 백엔드 구현
+2. ⏳ 수정 폼 UI
+3. ⏳ 권한 체크 (본인만 수정 가능)
+
+#### 추가 기능
+1. ⏳ 목격 정보 검색
+2. ⏳ 필터링 (동물 종류, 날짜, 위치)
+3. ⏳ 좋아요/북마크
+4. ⏳ 댓글 기능
+
+---
+
+## 📝 4단계: 제거할 파일 목록 ✅ 완료
+
+### 완전 삭제 완료
 ```
-app/features/pictures/          # 전체 삭제
-app/features/map/              # sightings/pages/map-page.tsx로 이동
-app/features/picture-submit/   # sightings/pages/submit-sighting-page.tsx로 이동
-app/features/users/layouts/dashboard-layout.tsx  # 불필요
-app/features/users/layouts/messages-layout.tsx   # 메시지 기능 없음
-app/features/users/pages/dashboard-*.tsx         # 대시보드 기능 없음
-app/features/users/pages/message*.tsx            # 메시지 기능 없음
-app/features/users/pages/notifications-page.tsx # 알림 기능 없음
-app/features/auth/layouts/auth-layout.tsx       # 레이아웃 불필요
-app/features/auth/pages/otp-*.tsx               # OTP 없음
-app/features/auth/pages/social-*.tsx            # 소셜 로그인 없음
+✅ app/features/pictures/          # 전체 삭제
+✅ app/features/map/              # 전체 삭제 (추후 재구현)
+✅ app/features/users/layouts/dashboard-layout.tsx
+✅ app/features/users/layouts/messages-layout.tsx
+✅ app/features/users/pages/dashboard-*.tsx
+✅ app/features/users/pages/message*.tsx
+✅ app/features/users/pages/notifications-page.tsx
+✅ app/features/auth/layouts/auth-layout.tsx
+✅ app/features/auth/pages/otp-*.tsx
+✅ app/features/auth/pages/social-*.tsx
 ```
 
 ---
@@ -567,19 +593,29 @@ app/features/auth/pages/social-*.tsx            # 소셜 로그인 없음
 
 ---
 
-## 📊 6단계: 예상 일정
+## 📊 6단계: 구현 현황
 
-| Phase | 작업 내용 | 예상 기간 | 우선순위 |
-|-------|----------|----------|---------|
-| Phase 1 | 인증 시스템 | 1-2일 | ⭐⭐⭐ |
-| Phase 2 | 사용자 프로필 | 1일 | ⭐⭐⭐ |
-| Phase 3 | 미디어 목록 | 1-2일 | ⭐⭐⭐ |
-| Phase 4 | AI 동물 인식 | 2일 | ⭐⭐ |
-| Phase 5 | Sighting 생성 | 2-3일 | ⭐⭐⭐ |
-| Phase 6 | Sighting 상세 | 1-2일 | ⭐⭐ |
-| Phase 7 | 지도 기능 | 1-2일 | ⭐ |
-| Phase 8 | 홈/네비게이션 | 1일 | ⭐ |
-| **총계** | | **10-15일** | |
+| Phase | 작업 내용 | 예상 기간 | 실제 소요 | 상태 |
+|-------|----------|----------|----------|------|
+| Phase 1 | 인증 시스템 | 1-2일 | - | ✅ 완료 |
+| Phase 2 | 사용자 프로필 | 1일 | - | ✅ 완료 |
+| Phase 3 | 미디어 목록 | 1-2일 | - | ✅ 완료 |
+| Phase 4 | AI 동물 인식 | 2일 | - | ✅ 완료 |
+| Phase 5 | Sighting 생성 | 2-3일 | - | ✅ 완료 |
+| Phase 6 | Sighting 상세 | 1-2일 | - | ✅ 완료 |
+| Phase 7 | 홈페이지 업데이트 | 1일 | - | ✅ 완료 |
+| Phase 8 | 프로젝트 정리 | 0.5일 | - | ✅ 완료 |
+| **총계** | **핵심 기능 완료** | **10-15일** | - | ✅ |
+
+### 구현 완료된 주요 기능
+1. ✅ JWT 쿠키 기반 인증 (로그인, 회원가입, 로그아웃)
+2. ✅ 사용자 프로필 관리
+3. ✅ 목격 정보 목록 조회 (공개/내 목격 정보)
+4. ✅ AI 동물 인식 자동 실행
+5. ✅ 사진 업로드 시 자동 목격 정보 생성
+6. ✅ 목격 정보 상세 페이지
+7. ✅ 반응형 홈페이지 (Hero, Features, 최근 목격 정보)
+8. ✅ 네비게이션 (데스크톱/모바일)
 
 ---
 
