@@ -29,13 +29,19 @@ export const sightingsApi = {
   },
 
   /**
-   * Sighting 수정 (제목, 설명 수정)
-   * TODO: 백엔드 API 구현 후 연결
+   * Sighting 수정 (제목, 설명, 공개 여부 수정)
    */
   update: async (
     sightingId: string,
     data: UpdateSightingRequest
   ): Promise<UpdateSightingResponse> => {
     return apiClient.patch(`/api/v1/sightings/${sightingId}`, data);
+  },
+
+  /**
+   * Sighting 삭제
+   */
+  delete: async (sightingId: string): Promise<void> => {
+    return apiClient.delete(`/api/v1/sightings/${sightingId}`);
   },
 };

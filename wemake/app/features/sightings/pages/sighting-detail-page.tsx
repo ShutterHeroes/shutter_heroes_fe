@@ -7,6 +7,14 @@ import { Button } from '~/common/components/ui/button';
 import { Badge } from '~/common/components/ui/badge';
 import { Separator } from '~/common/components/ui/separator';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/common/components/ui/dialog';
+import {
   Loader2,
   MapPin,
   Calendar,
@@ -15,7 +23,10 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 정보 상세 | 셔터 히어로즈' }];
@@ -24,9 +35,12 @@ export const meta: MetaFunction = () => {
 export default function SightingDetailPage() {
   const { sightingId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [sighting, setSighting] = useState<SightingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!sightingId) {
@@ -49,6 +63,24 @@ export default function SightingDetailPage() {
 
     fetchSighting();
   }, [sightingId]);
+
+  const handleDelete = async () => {
+    if (!sightingId) return;
+
+    setIsDeleting(true);
+    try {
+      await sightingsApi.delete(sightingId);
+      navigate('/my/sightings');
+    } catch (err: any) {
+      console.error('Sighting 삭제 에러:', err);
+      setError(err.response?.data?.message || '목격 정보 삭제에 실패했습니다.');
+      setShowDeleteDialog(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const isOwner = user && sighting && user.userId === sighting.owner.userId;
 
   if (isLoading) {
     return (
@@ -76,7 +108,43 @@ export default function SightingDetailPage() {
   const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${sighting.media.mediaId}/download`;
 
   return (
-    <div className="container mx-auto max-w-4xl py-8 space-y-6">
+    <>
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>목격 정보 삭제</DialogTitle>
+            <DialogDescription>
+              정말로 이 목격 정보를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeleting}
+            >
+              취소
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  삭제 중...
+                </>
+              ) : (
+                '삭제'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="container mx-auto max-w-4xl py-8 space-y-6">
       {/* 뒤로 가기 버튼 */}
       <Button variant="ghost" onClick={() => navigate('/sightings')}>
         <ArrowLeft className="w-4 h-4 mr-2" />
@@ -207,15 +275,37 @@ export default function SightingDetailPage() {
         </CardContent>
       </Card>
 
-      {/* 수정 버튼 (추후 권한 체크 필요) */}
-      <div className="flex gap-4">
-        <Button variant="outline" className="flex-1" onClick={() => navigate('/sightings')}>
-          목록으로
-        </Button>
-        <Button className="flex-1" disabled>
-          수정하기 (준비 중)
-        </Button>
-      </div>
+      {/* 수정/삭제 버튼 (본인만 가능) */}
+      {isOwner ? (
+        <div className="flex gap-4">
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/sightings')}>
+            목록으로
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => navigate(`/sightings/${sightingId}/edit`)}
+          >
+            <Pencil className="w-4 h-4 mr-2" />
+            수정하기
+          </Button>
+          <Button
+            variant="destructive"
+            className="flex-1"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            삭제하기
+          </Button>
+        </div>
+      ) : (
+        <div className="flex gap-4">
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/sightings')}>
+            목록으로
+          </Button>
+        </div>
+      )}
     </div>
+    </>
   );
 }
