@@ -7,7 +7,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { mediaApi } from '~/lib/api/media.api';
 import type { Media } from '~/lib/types/media.types';
 import { MediaGrid } from '~/features/sightings/components/media-grid';
-import { Upload, Sparkles, Users, TrendingUp, ArrowRight } from 'lucide-react';
+import { Upload, Sparkles, Users, TrendingUp, ArrowRight, Map } from 'lucide-react';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -64,6 +64,12 @@ export default function HomePage() {
                 <Link to="/sightings/submit">
                   <Upload className="w-5 h-5 mr-2" />
                   목격 정보 등록하기
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="text-lg px-8">
+                <Link to="/map">
+                  <Map className="w-5 h-5 mr-2" />
+                  지도에서 보기
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-lg px-8">
