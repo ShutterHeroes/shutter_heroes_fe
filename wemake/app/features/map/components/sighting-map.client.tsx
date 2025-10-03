@@ -19,6 +19,8 @@ interface SightingMapClientProps {
   height?: string;
   onMarkerClick?: (sighting: SightingListItem) => void;
   onMapMove?: (center: { lat: number; lng: number }, zoom: number) => void;
+  userLocation?: { lat: number; lng: number } | null;
+  searchRadius?: number; // 검색 반경 (미터 단위)
 }
 
 export function SightingMapClient({
@@ -28,10 +30,15 @@ export function SightingMapClient({
   height = '600px',
   onMarkerClick,
   onMapMove,
+  userLocation,
+  searchRadius,
 }: SightingMapClientProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const radiusCircleRef = useRef<L.Circle | null>(null);
+  const isMovingProgrammaticallyRef = useRef(false);
 
   // 지도 초기화 (한 번만 실행)
   useEffect(() => {
@@ -117,6 +124,12 @@ export function SightingMapClient({
     if (!mapInstanceRef.current || !onMapMove) return;
 
     const handleMoveEnd = () => {
+      // 프로그래밍 방식의 이동이면 콜백 호출하지 않음
+      if (isMovingProgrammaticallyRef.current) {
+        isMovingProgrammaticallyRef.current = false;
+        return;
+      }
+
       const center = mapInstanceRef.current!.getCenter();
       const zoom = mapInstanceRef.current!.getZoom();
       onMapMove({ lat: center.lat, lng: center.lng }, zoom);
@@ -197,6 +210,83 @@ export function SightingMapClient({
     //   mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
     // }
   }, [sightings, onMarkerClick]);
+
+  // center와 zoom 변경 시 지도 업데이트
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    const currentCenter = mapInstanceRef.current.getCenter();
+    const currentZoom = mapInstanceRef.current.getZoom();
+
+    // 현재 위치와 다를 때만 이동 (무한 루프 방지)
+    const isCenterDifferent = Math.abs(currentCenter.lat - center.lat) > 0.0001 ||
+                              Math.abs(currentCenter.lng - center.lng) > 0.0001;
+    const isZoomDifferent = currentZoom !== zoom;
+
+    if (isCenterDifferent || isZoomDifferent) {
+      console.log('[MapClient] Moving map to:', center, 'zoom:', zoom);
+      isMovingProgrammaticallyRef.current = true;
+      mapInstanceRef.current.setView([center.lat, center.lng], zoom);
+    }
+  }, [center, zoom]);
+
+  // 사용자 위치 마커 표시
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // 기존 사용자 마커 제거
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+
+    // 사용자 위치가 있으면 마커 추가
+    if (userLocation) {
+      const userIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+      });
+
+      const marker = L.marker([userLocation.lat, userLocation.lng], { icon: userIcon });
+      marker.bindPopup('<div class="p-2"><strong>내 위치</strong></div>');
+      marker.addTo(mapInstanceRef.current);
+      userMarkerRef.current = marker;
+
+      console.log('[MapClient] User location marker added:', userLocation);
+    }
+  }, [userLocation]);
+
+  // 검색 반경 원 표시
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // 기존 반경 원 제거
+    if (radiusCircleRef.current) {
+      radiusCircleRef.current.remove();
+      radiusCircleRef.current = null;
+    }
+
+    // 검색 반경이 있으면 원 추가 (실제 반경의 80%로 표시)
+    if (searchRadius && searchRadius > 0) {
+      const circle = L.circle([center.lat, center.lng], {
+        radius: searchRadius * 0.8, // 실제 검색 반경보다 작게 표시 (검색되는 식제 데이터에 맞춤)
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.1,
+        weight: 2,
+        dashArray: '5, 5',
+      });
+
+      circle.addTo(mapInstanceRef.current);
+      radiusCircleRef.current = circle;
+
+      console.log('[MapClient] Search radius circle added:', searchRadius);
+    }
+  }, [center, searchRadius]);
 
   return <div ref={mapRef} style={{ height, width: '100%', position: 'relative', zIndex: 0 }} className="rounded-lg shadow-md" />;
 }

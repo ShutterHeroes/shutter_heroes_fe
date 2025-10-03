@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/common/components/ui/dialog';
-import { SearchIcon, Loader2Icon, XIcon, MapIcon, ImageOff } from 'lucide-react';
+import { SearchIcon, Loader2Icon, XIcon, MapIcon, ImageOff, Navigation, Circle } from 'lucide-react';
 import type { SightingListItem } from '~/lib/types/sighting.types';
 import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
 import { sightingsApi } from '~/lib/api/sightings.api';
@@ -20,14 +20,19 @@ export const meta: MetaFunction = () => {
   return [{ title: '목격 지도 | 셔터 히어로즈' }];
 };
 
-// 줌 레벨에 따른 반경 계산 (meters)
+// 줌 레벨에 따른 반경 계산 (meters) - 3배 이상 증가
 function getRadiusFromZoom(zoom: number): number {
-  if (zoom >= 17) return 500; // 가장 확대: 500m
-  if (zoom >= 15) return 1000; // 중간 확대: 1km
-  if (zoom >= 13) return 2000; // 중간: 2km
-  if (zoom >= 11) return 5000; // 축소: 5km
-  if (zoom >= 9) return 10000; // 많이 축소: 10km
-  return 20000; // 전체 뷰: 20km
+  if (zoom >= 17) return 200;
+  if (zoom >= 15) return 800;
+  if (zoom >= 14) return 1500;
+  if (zoom >= 13) return 3000;
+  if (zoom >= 12) return 6000;
+  if (zoom >= 11) return 12000;
+  if (zoom >= 10) return 24000;
+  if (zoom >= 9) return 48000;
+  if (zoom >= 8) return 96000;
+  if (zoom >= 7) return 120000;
+  return 150000;
 }
 
 // 미터를 km 또는 m으로 표시
@@ -71,6 +76,9 @@ export default function MapPage() {
   const [mapZoom, setMapZoom] = useState(initialState.zoom);
   const [totalCount, setTotalCount] = useState(0);
   const [imageError, setImageError] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [showSearchRadius, setShowSearchRadius] = useState(true);
 
   // 지도 중심과 줌 레벨에 따라 nearby API 호출
   const fetchNearbySightings = useCallback(async (lat: number, lng: number, zoom: number) => {
@@ -110,9 +118,41 @@ export default function MapPage() {
     }
   }, []);
 
-  // 초기 데이터 로드
+  // 사용자 위치 가져오기
+  const getUserLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert('이 브라우저는 위치 정보를 지원하지 않습니다.');
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        setIsLoadingLocation(false);
+      },
+      (error) => {
+        console.error('위치 정보 가져오기 실패:', error);
+        alert('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요.');
+        setIsLoadingLocation(false);
+      }
+    );
+  }, []);
+
+  // 현재 위치로 이동
+  const moveToUserLocation = useCallback(() => {
+    if (userLocation) {
+      setMapCenter(userLocation);
+    } else {
+      getUserLocation();
+    }
+  }, [userLocation, getUserLocation]);
+
+  // 초기 데이터 로드 및 사용자 위치 가져오기
   useEffect(() => {
     fetchNearbySightings(mapCenter.lat, mapCenter.lng, mapZoom);
+    getUserLocation();
   }, []);
 
   // 지도 이동/확대 이벤트 핸들러 (위치만 저장, 자동 검색하지 않음)
@@ -165,7 +205,7 @@ export default function MapPage() {
 
       {/* 통계 정보 및 재검색 버튼 */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-6 flex-wrap">
             <div className="text-sm">
               <span className="text-gray-600">지도에 표시:</span>{' '}
@@ -183,25 +223,60 @@ export default function MapPage() {
             </div>
           </div>
 
-          {/* 재검색 버튼 */}
-          <Button
-            onClick={handleRefreshSearch}
-            disabled={isLoading}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader2Icon className="w-4 h-4 animate-spin" />
-                검색 중...
-              </>
-            ) : (
-              <>
-                <SearchIcon className="w-4 h-4" />
-                현재 위치에서 재검색
-              </>
-            )}
-          </Button>
+          {/* 버튼 그룹 */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* 검색 반경 표시 토글 버튼 */}
+            <Button
+              onClick={() => setShowSearchRadius(!showSearchRadius)}
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Circle className="w-4 h-4" />
+              {showSearchRadius ? '반경 숨기기' : '반경 표시'}
+            </Button>
+
+            {/* 현재 위치로 이동 버튼 */}
+            <Button
+              onClick={moveToUserLocation}
+              disabled={isLoadingLocation}
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {isLoadingLocation ? (
+                <>
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                  위치 확인 중...
+                </>
+              ) : (
+                <>
+                  <Navigation className="w-4 h-4" />
+                  내 위치로
+                </>
+              )}
+            </Button>
+
+            {/* 재검색 버튼 */}
+            <Button
+              onClick={handleRefreshSearch}
+              disabled={isLoading}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                  검색 중...
+                </>
+              ) : (
+                <>
+                  <SearchIcon className="w-4 h-4" />
+                  현재 위치에서 재검색
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -214,6 +289,8 @@ export default function MapPage() {
           height="600px"
           onMarkerClick={handleMarkerClick}
           onMapMove={handleMapMove}
+          userLocation={userLocation}
+          searchRadius={showSearchRadius ? getRadiusFromZoom(mapZoom) : undefined}
         />
 
         {/* 위치 정보가 없을 때 안내 메시지 */}
@@ -238,14 +315,14 @@ export default function MapPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               {/* 이미지 */}
               <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                {imageError || !selectedSighting.sanitizedUrl ? (
+                {imageError || (!selectedSighting.sanitizedUrl && !selectedSighting.storagePath) ? (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
                     <ImageOff className="w-16 h-16 text-gray-400 mb-2" />
                     <p className="text-gray-500 text-sm">이미지를 불러올 수 없습니다</p>
                   </div>
                 ) : (
                   <img
-                    src={selectedSighting.sanitizedUrl}
+                    src={selectedSighting.sanitizedUrl || selectedSighting.storagePath}
                     alt={selectedSighting.title}
                     className="w-full h-full object-cover"
                     onError={() => setImageError(true)}

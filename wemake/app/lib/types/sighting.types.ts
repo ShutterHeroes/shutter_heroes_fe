@@ -122,7 +122,8 @@ export interface SightingListItem {
   commonNameEn: string | null;
   scientificName: string | null;
   status: 'general' | 'endangered' | 'natural_monument' | null;
-  sanitizedUrl: string;
+  storagePath?: string; // 백엔드 nearby API 응답
+  sanitizedUrl?: string; // 기존 browse API 응답
   geom: GeoJsonPoint | string | null; // GeoJSON Point 객체 또는 WKT 문자열: "POINT(126.9784 37.5667)"
 }
 
