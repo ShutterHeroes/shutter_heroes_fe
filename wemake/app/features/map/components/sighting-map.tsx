@@ -10,6 +10,7 @@ interface SightingMapProps {
   zoom?: number;
   height?: string;
   onMarkerClick?: (sighting: SightingListItem) => void;
+  onMapMove?: (center: { lat: number; lng: number }, zoom: number) => void;
 }
 
 export function SightingMap(props: SightingMapProps) {

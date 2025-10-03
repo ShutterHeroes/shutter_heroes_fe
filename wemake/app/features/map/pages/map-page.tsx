@@ -1,45 +1,91 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { type MetaFunction } from 'react-router';
-import { useAllSightings } from '~/features/sightings/hooks/use-all-sightings';
 import { SightingMap } from '../components/sighting-map';
 import { Button } from '~/common/components/ui/button';
 import { Input } from '~/common/components/ui/input';
 import { SearchIcon, Loader2Icon, XIcon, MapIcon } from 'lucide-react';
 import type { SightingListItem } from '~/lib/types/sighting.types';
-import { parseWKTPoint } from '~/lib/utils/geo.utils';
+import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
+import { sightingsApi } from '~/lib/api/sightings.api';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 지도 | 셔터 히어로즈' }];
 };
 
+// 줌 레벨에 따른 반경 계산 (meters)
+function getRadiusFromZoom(zoom: number): number {
+  if (zoom >= 17) return 500; // 가장 확대: 500m
+  if (zoom >= 15) return 1000; // 중간 확대: 1km
+  if (zoom >= 13) return 2000; // 중간: 2km
+  if (zoom >= 11) return 5000; // 축소: 5km
+  if (zoom >= 9) return 10000; // 많이 축소: 10km
+  return 20000; // 전체 뷰: 20km
+}
+
+// 미터를 km 또는 m으로 표시
+function formatRadius(meters: number): string {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1)}km`;
+  }
+  return `${meters}m`;
+}
+
 export default function MapPage() {
-  const { sightings, isLoading, error, fetchSightings } = useAllSightings();
+  const [sightings, setSightings] = useState<SightingListItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedSighting, setSelectedSighting] = useState<SightingListItem | null>(null);
+  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER);
+  const [mapZoom, setMapZoom] = useState(13);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // 초기 데이터 로드 (위치 정보가 있는 모든 목격 정보)
-  useEffect(() => {
-    fetchSightings({ page: 0, size: 1000 }); // 지도에 모든 마커 표시
-  }, [fetchSightings]);
+  // 지도 중심과 줌 레벨에 따라 nearby API 호출
+  const fetchNearbySightings = useCallback(async (lat: number, lng: number, zoom: number) => {
+    setIsLoading(true);
+    setError(null);
 
-  const handleSearch = () => {
-    setKeyword(searchInput);
-    fetchSightings({ page: 0, size: 1000, keyword: searchInput || undefined });
-  };
+    try {
+      const radiusMeters = getRadiusFromZoom(zoom);
+      const response = await sightingsApi.getNearby({
+        lat: lat,
+        lon: lng,
+        radiusMeters: radiusMeters,
+      });
 
-  const handleClearSearch = () => {
-    setSearchInput('');
-    setKeyword('');
-    fetchSightings({ page: 0, size: 1000 });
-  };
+      console.log('[Map] Nearby API response:', response);
+      console.log('[Map] Sample sighting:', response[0]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+      // 응답이 배열로 오므로 직접 설정
+      setSightings(response);
+      setTotalCount(response.length);
+    } catch (err: any) {
+      console.error('Error fetching nearby sightings:', err);
+      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다');
+      setSightings([]);
+      setTotalCount(0);
+    } finally {
+      setIsLoading(false);
     }
+  }, []);
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    fetchNearbySightings(mapCenter.lat, mapCenter.lng, mapZoom);
+  }, []);
+
+  // 지도 이동/확대 이벤트 핸들러 (위치만 저장, 자동 검색하지 않음)
+  const handleMapMove = useCallback((center: { lat: number; lng: number }, zoom: number) => {
+    setMapCenter(center);
+    setMapZoom(zoom);
+  }, []);
+
+  // 현재 위치에서 재검색 버튼 핸들러
+  const handleRefreshSearch = () => {
+    fetchNearbySightings(mapCenter.lat, mapCenter.lng, mapZoom);
   };
 
   const handleMarkerClick = (sighting: SightingListItem) => {
@@ -47,27 +93,22 @@ export default function MapPage() {
   };
 
   // 위치 정보가 있는 목격 정보만 필터링
-  const sightingsWithLocation = sightings?.content.filter((s) => {
+  const sightingsWithLocation = sightings.filter((s) => {
     const position = parseWKTPoint(s.geom);
+    if (!position && s.geom) {
+      console.warn('[Map] Failed to parse geom:', s.geom, 'for sighting:', s.id);
+    }
     return position !== null;
-  }) || [];
+  });
 
-  if (isLoading && !sightings) {
-    return (
-      <div className="container mx-auto py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2Icon className="w-8 h-8 animate-spin text-gray-500" />
-        </div>
-      </div>
-    );
-  }
+  console.log('[Map] Total sightings:', sightings.length, 'With location:', sightingsWithLocation.length);
 
   if (error) {
     return (
       <div className="container mx-auto py-8">
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
           <p className="text-red-500">{error}</p>
-          <Button onClick={() => fetchSightings({ page: 0, size: 1000 })}>
+          <Button onClick={() => fetchNearbySightings(mapCenter.lat, mapCenter.lng, mapZoom)}>
             다시 시도
           </Button>
         </div>
@@ -77,86 +118,72 @@ export default function MapPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-      {/* 헤더 및 검색 */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <MapIcon className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">목격 지도</h1>
-        </div>
-
-        {/* 검색 바 */}
-        <div className="flex gap-2">
-          <div className="relative flex-1 max-w-md">
-            <Input
-              type="text"
-              placeholder="동물 이름으로 검색... (예: 붉은여우, Vulpes vulpes)"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="pr-10"
-            />
-            {searchInput && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <XIcon className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <Button onClick={handleSearch} disabled={isLoading}>
-            <SearchIcon className="w-4 h-4 mr-2" />
-            검색
-          </Button>
-        </div>
+      {/* 헤더 */}
+      <div className="flex items-center gap-3">
+        <MapIcon className="w-8 h-8 text-blue-600" />
+        <h1 className="text-3xl font-bold">목격 지도</h1>
       </div>
 
-      {/* 통계 정보 */}
-      <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-6">
-          <div className="text-sm">
-            <span className="text-gray-600">전체 목격 정보:</span>{' '}
-            <span className="font-semibold text-blue-800">{sightings?.totalElements || 0}건</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-gray-600">지도에 표시:</span>{' '}
-            <span className="font-semibold text-blue-800">{sightingsWithLocation.length}건</span>
-          </div>
-          {keyword && (
+      {/* 통계 정보 및 재검색 버튼 */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-6 flex-wrap">
             <div className="text-sm">
-              <span className="text-gray-600">검색 결과:</span>{' '}
-              <span className="font-semibold text-blue-800">"{keyword}"</span>
+              <span className="text-gray-600">지도에 표시:</span>{' '}
+              <span className="font-semibold text-blue-800">{sightingsWithLocation.length}건</span>
             </div>
-          )}
-        </div>
-        {keyword && (
-          <Button variant="ghost" size="sm" onClick={handleClearSearch}>
-            검색 초기화
+            <div className="text-sm">
+              <span className="text-gray-600">검색 반경:</span>{' '}
+              <span className="font-semibold text-blue-800">{formatRadius(getRadiusFromZoom(mapZoom))}</span>
+            </div>
+            <div className="text-sm">
+              <span className="text-gray-600">중심 좌표:</span>{' '}
+              <span className="font-mono text-xs text-blue-800">
+                {mapCenter.lat.toFixed(4)}, {mapCenter.lng.toFixed(4)}
+              </span>
+            </div>
+          </div>
+
+          {/* 재검색 버튼 */}
+          <Button
+            onClick={handleRefreshSearch}
+            disabled={isLoading}
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2Icon className="w-4 h-4 animate-spin" />
+                검색 중...
+              </>
+            ) : (
+              <>
+                <SearchIcon className="w-4 h-4" />
+                현재 위치에서 재검색
+              </>
+            )}
           </Button>
-        )}
+        </div>
       </div>
 
       {/* 지도 - 목격 정보가 없어도 항상 표시 */}
       <div className="space-y-4">
         <SightingMap
           sightings={sightingsWithLocation}
+          center={mapCenter}
+          zoom={mapZoom}
           height="600px"
           onMarkerClick={handleMarkerClick}
+          onMapMove={handleMapMove}
         />
 
         {/* 위치 정보가 없을 때 안내 메시지 */}
-        {sightingsWithLocation.length === 0 && (
+        {sightingsWithLocation.length === 0 && !isLoading && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
             <p className="text-yellow-800 text-sm">
-              {keyword
-                ? '검색된 목격 정보 중 위치 정보가 있는 항목이 없습니다.'
-                : '지도에 표시할 위치 정보가 없습니다. 기본 위치(서울)를 표시합니다.'}
+              현재 위치(반경 {formatRadius(getRadiusFromZoom(mapZoom))})에 목격 정보가 없습니다.
+              지도를 이동하거나 축소해보세요.
             </p>
-            {keyword && (
-              <Button variant="outline" size="sm" onClick={handleClearSearch} className="mt-2">
-                전체 목록 보기
-              </Button>
-            )}
           </div>
         )}
       </div>

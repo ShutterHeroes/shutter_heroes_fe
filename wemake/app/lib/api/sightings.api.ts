@@ -7,6 +7,8 @@ import type {
   SightingDetail,
   SightingListResponse,
   GetSightingsParams,
+  GetNearbySightingsParams,
+  NearbySightingsResponse,
 } from '../types/sighting.types';
 
 export const sightingsApi = {
@@ -57,6 +59,22 @@ export const sightingsApi = {
         size: params.size ?? 20,
         sort: params.sort ?? ['createdAt,DESC'],
         keyword: params.keyword,
+      },
+    });
+  },
+
+  /**
+   * 근처 Sighting 조회 (위치 기반 검색)
+   * @param params - lat/lon 또는 centerId 중 하나 필수, radiusMeters로 반경 지정 (기본 500m)
+   * @returns 배열 형태로 반환 (페이지네이션 없음)
+   */
+  getNearby: async (params: GetNearbySightingsParams): Promise<NearbySightingsResponse> => {
+    return apiClient.get('/api/v1/sightings/nearby', {
+      params: {
+        lat: params.lat,
+        lon: params.lon,
+        centerId: params.centerId,
+        radiusMeters: params.radiusMeters ?? 500, // 기본 500m
       },
     });
   },

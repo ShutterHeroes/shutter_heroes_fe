@@ -18,6 +18,7 @@ interface SightingMapClientProps {
   zoom?: number;
   height?: string;
   onMarkerClick?: (sighting: SightingListItem) => void;
+  onMapMove?: (center: { lat: number; lng: number }, zoom: number) => void;
 }
 
 export function SightingMapClient({
@@ -26,6 +27,7 @@ export function SightingMapClient({
   zoom = DEFAULT_ZOOM,
   height = '600px',
   onMarkerClick,
+  onMapMove,
 }: SightingMapClientProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -90,6 +92,28 @@ export function SightingMapClient({
 
     L.control.layers(baseMaps).addTo(map);
 
+    // 축척 바 추가 (미터/킬로미터 표시)
+    L.control
+      .scale({
+        imperial: false, // 야드/마일 단위 숨김
+        metric: true, // 미터/킬로미터 단위 표시
+        position: 'bottomleft',
+      })
+      .addTo(map);
+
+    // 지도 이동/확대 이벤트 리스너
+    if (onMapMove) {
+      const handleMoveEnd = () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        onMapMove({ lat: center.lat, lng: center.lng }, zoom);
+      };
+
+      // moveend: 드래그나 확대/축소가 끝났을 때 발생
+      map.on('moveend', handleMoveEnd);
+      map.on('zoomend', handleMoveEnd);
+    }
+
     mapInstanceRef.current = map;
 
     // 클린업
@@ -99,11 +123,13 @@ export function SightingMapClient({
         mapInstanceRef.current = null;
       }
     };
-  }, [center.lat, center.lng, zoom]);
+  }, [center.lat, center.lng, zoom, onMapMove]);
 
   // 마커 업데이트
   useEffect(() => {
     if (!mapInstanceRef.current) return;
+
+    console.log('[MapClient] Updating markers, sightings count:', sightings.length);
 
     // 기존 마커 제거
     markersRef.current.forEach((marker) => marker.remove());
@@ -115,7 +141,10 @@ export function SightingMapClient({
 
     sightings.forEach((sighting) => {
       const position = parseWKTPoint(sighting.geom);
-      if (!position) return;
+      if (!position) {
+        console.warn('[MapClient] No position for sighting:', sighting.id, 'geom:', sighting.geom);
+        return;
+      }
 
       const marker = L.marker([position.lat, position.lng]);
 
@@ -155,6 +184,7 @@ export function SightingMapClient({
       bounds.push(L.latLngBounds([position.lat, position.lng], [position.lat, position.lng]));
     });
 
+    console.log('[MapClient] Total markers created and added to map:', newMarkers.length);
     markersRef.current = newMarkers;
 
     // 모든 마커가 보이도록 지도 조정

@@ -122,3 +122,14 @@ export interface GetSightingsParams {
   sort?: string[];
   keyword?: string;
 }
+
+// Nearby Sightings 조회용 타입
+export interface GetNearbySightingsParams {
+  lat?: number; // 중심 위도
+  lon?: number; // 중심 경도
+  centerId?: string; // 특정 sighting UUID (이것을 사용하면 해당 sighting 좌표 기준)
+  radiusMeters?: number; // 검색 반경 (미터, 기본 500m)
+}
+
+// Nearby API 응답은 배열로 반환 (페이지네이션 없음)
+export type NearbySightingsResponse = SightingListItem[];
