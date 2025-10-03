@@ -5,6 +5,8 @@ import type {
   UpdateSightingRequest,
   UpdateSightingResponse,
   SightingDetail,
+  SightingListResponse,
+  GetSightingsParams,
 } from '../types/sighting.types';
 
 export const sightingsApi = {
@@ -43,5 +45,19 @@ export const sightingsApi = {
    */
   delete: async (sightingId: string): Promise<void> => {
     return apiClient.delete(`/api/v1/sightings/${sightingId}`);
+  },
+
+  /**
+   * Sighting 목록 조회 (페이지네이션, 검색)
+   */
+  getAll: async (params: GetSightingsParams = {}): Promise<SightingListResponse> => {
+    return apiClient.get('/api/v1/sightings', {
+      params: {
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+        sort: params.sort ?? ['createdAt,DESC'],
+        keyword: params.keyword,
+      },
+    });
   },
 };

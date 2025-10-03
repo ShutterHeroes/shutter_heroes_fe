@@ -84,3 +84,41 @@ export interface UpdateSightingResponse {
   visibility: 'public' | 'private';
   updatedAt: string;
 }
+
+// Sighting 목록 조회용 타입
+export interface SightingListItem {
+  id: string;
+  title: string;
+  description: string | null;
+  occurredAt: string | null;
+  detectedBy: string;
+  aiConfidence: number | null;
+  visibility: 'public' | 'private';
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  displayName: string;
+  commonNameKo: string | null;
+  commonNameEn: string | null;
+  scientificName: string | null;
+  status: 'general' | 'endangered' | 'natural_monument' | null;
+  sanitizedUrl: string;
+  geom: string | null; // WKT 형식: "POINT(126.9784 37.5667)"
+}
+
+export interface SightingListResponse {
+  content: SightingListItem[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
+
+export interface GetSightingsParams {
+  page?: number;
+  size?: number;
+  sort?: string[];
+  keyword?: string;
+}
