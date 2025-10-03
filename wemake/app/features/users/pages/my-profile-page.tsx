@@ -1,10 +1,12 @@
 import { type MetaFunction } from 'react-router';
 import { useAuth } from '~/lib/hooks/use-auth.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
-import { Avatar } from '~/common/components/ui/avatar';
+import {Avatar, AvatarImage} from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
 import { Button } from '~/common/components/ui/button';
 import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { sightingsApi } from '~/lib/api/sightings.api';
 
 export const meta: MetaFunction = () => {
   return [{ title: '내 프로필 | 셔터 히어로즈' }];
@@ -12,6 +14,22 @@ export const meta: MetaFunction = () => {
 
 export default function MyProfilePage() {
   const { user, isLoading } = useAuth();
+  const [sightingsCount, setSightingsCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchSightingsCount = async () => {
+      if (!user) return;
+
+      try {
+        const response = await sightingsApi.getMySightings({ page: 0, size: 1 });
+        setSightingsCount(response.totalElements);
+      } catch (error) {
+        console.error('목격 정보 개수 조회 실패:', error);
+      }
+    };
+
+    fetchSightingsCount();
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -47,13 +65,7 @@ export default function MyProfilePage() {
         <CardHeader>
           <div className="flex items-center gap-6">
             <Avatar className="h-24 w-24">
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.displayName} />
-              ) : (
-                <div className="bg-gray-300 h-full w-full flex items-center justify-center text-gray-600 text-3xl">
-                  {user.displayName.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <AvatarImage src={user.avatarUrl || "https://shutter-heroes-dev.s3.ap-northeast-2.amazonaws.com/images/logo/logo.png"} alt={user.displayName} />
             </Avatar>
             <div className="flex-1">
               <CardTitle className="text-2xl">{user.displayName}</CardTitle>
@@ -94,7 +106,15 @@ export default function MyProfilePage() {
           )}
 
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">내 목격 정보는 곧 추가될 예정입니다.</p>
+            <p className="text-sm text-gray-500">내 목격 정보</p>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-2xl font-bold">
+                {sightingsCount !== null ? `${sightingsCount}건` : '로딩 중...'}
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/my/sightings">전체 보기</Link>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

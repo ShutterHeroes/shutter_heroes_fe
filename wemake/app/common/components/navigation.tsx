@@ -158,7 +158,7 @@ export default function Navigation({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                  <AvatarImage src={user?.avatarUrl || "https://shutter-heroes-dev.s3.ap-northeast-2.amazonaws.com/images/logo/logo.png"} />
                   <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
@@ -212,7 +212,7 @@ export default function Navigation({
                 {/* User Info - Mobile */}
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <Avatar>
-                    <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                    <AvatarImage src={user?.avatarUrl || "https://shutter-heroes-dev.s3.ap-northeast-2.amazonaws.com/images/logo/logo.png"} />
                     <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
