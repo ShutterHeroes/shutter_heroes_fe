@@ -43,7 +43,7 @@ export interface MediaInfo {
 }
 
 export interface AnimalDetection {
-  detectionId: string;
+  detectionId?: string; // 선택 사항으로 변경
   scientificName: string;
   commonName: string | null;
   confidence: number;

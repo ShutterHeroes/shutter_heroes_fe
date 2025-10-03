@@ -7,9 +7,10 @@ interface ImageUploadProps {
   onImageSelect: (file: File) => void;
   selectedImage: File | null;
   onClear: () => void;
+  disabled?: boolean;
 }
 
-export function ImageUpload({ onImageSelect, selectedImage, onClear }: ImageUploadProps) {
+export function ImageUpload({ onImageSelect, selectedImage, onClear, disabled }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,10 +67,10 @@ export function ImageUpload({ onImageSelect, selectedImage, onClear }: ImageUplo
     <div className="space-y-4">
       {!selectedImage ? (
         <Card
-          className="border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          onDrop={disabled ? undefined : handleDrop}
+          onDragOver={disabled ? undefined : handleDragOver}
+          onClick={() => !disabled && fileInputRef.current?.click()}
         >
           <div className="p-12 text-center">
             <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -97,6 +98,7 @@ export function ImageUpload({ onImageSelect, selectedImage, onClear }: ImageUplo
               size="icon"
               className="absolute top-2 right-2"
               onClick={handleClear}
+              disabled={disabled}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -115,6 +117,7 @@ export function ImageUpload({ onImageSelect, selectedImage, onClear }: ImageUplo
         accept="image/*"
         onChange={handleFileChange}
         className="hidden"
+        disabled={disabled}
       />
     </div>
   );

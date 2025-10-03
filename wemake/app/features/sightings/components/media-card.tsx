@@ -11,7 +11,7 @@ interface MediaCardProps {
 
 export function MediaCard({ media }: MediaCardProps) {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = `http://localhost:8080${media.storagePath}`;
+  const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${media.mediaId}/download`;
   const createdDate = new Date(media.createdAt).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
