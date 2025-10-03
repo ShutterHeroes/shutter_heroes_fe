@@ -87,7 +87,7 @@ export default function SightingDetailPage() {
     }
   };
 
-  const isOwner = user && sighting && sighting.user && user.userId === sighting.user.id;
+  const isOwner = user && sighting && sighting.user && user.id === sighting.user.id;
 
   if (isLoading) {
     return (
