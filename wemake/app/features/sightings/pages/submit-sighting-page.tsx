@@ -3,6 +3,15 @@ import { type MetaFunction, useNavigate } from 'react-router';
 import { ImageUpload } from '~/features/ai/components/image-upload';
 import { sightingsApi } from '~/lib/api/sightings.api';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '~/common/components/ui/dialog';
+import { Button } from '~/common/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '~/lib/hooks/use-auth';
 
@@ -16,12 +25,18 @@ export default function SubmitSightingPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate('/auth/login');
+      setShowLoginDialog(true);
     }
-  }, [isLoading, user, navigate]);
+  }, [isLoading, user]);
+
+  const handleLoginRedirect = () => {
+    setShowLoginDialog(false);
+    navigate('/auth/login');
+  };
 
   const handleImageSelect = async (file: File) => {
     setSelectedImage(file);
@@ -57,43 +72,67 @@ export default function SubmitSightingPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 py-8">
-      <h1 className="text-3xl font-bold">동물 목격 정보 등록</h1>
+    <>
+      {/* 로그인 필요 다이얼로그 */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>로그인이 필요합니다</DialogTitle>
+            <DialogDescription>
+              목격 정보를 등록하려면 로그인이 필요합니다.
+              <br />
+              로그인 페이지로 이동하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              취소
+            </Button>
+            <Button onClick={handleLoginRedirect}>
+              로그인하기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* 이미지 업로드 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>사진 업로드</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ImageUpload
-            onImageSelect={handleImageSelect}
-            selectedImage={selectedImage}
-            onClear={handleClear}
-            disabled={isSubmitting}
-          />
-          <p className="text-sm text-gray-500 mt-2">
-            사진을 선택하면 자동으로 AI가 동물을 인식하고 목격 정보가 생성됩니다.
-            <br />
-            제목과 설명은 나중에 수정할 수 있습니다.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="container mx-auto max-w-4xl space-y-6 py-8">
+        <h1 className="text-3xl font-bold">동물 목격 정보 등록</h1>
 
-      {/* 에러 메시지 */}
-      {error && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
-      )}
+        {/* 이미지 업로드 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>사진 업로드</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ImageUpload
+              onImageSelect={handleImageSelect}
+              selectedImage={selectedImage}
+              onClear={handleClear}
+              disabled={isSubmitting}
+            />
+            <p className="text-sm text-gray-500 mt-2">
+              사진을 선택하면 자동으로 AI가 동물을 인식하고 목격 정보가 생성됩니다.
+              <br />
+              제목과 설명은 나중에 수정할 수 있습니다.
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* 로딩 상태 */}
-      {isSubmitting && (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-500 mr-2" />
-          <span className="text-gray-600">목격 정보를 생성하는 중...</span>
-        </div>
-      )}
-    </div>
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
+        {/* 로딩 상태 */}
+        {isSubmitting && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-gray-500 mr-2" />
+            <span className="text-gray-600">목격 정보를 생성하는 중...</span>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
