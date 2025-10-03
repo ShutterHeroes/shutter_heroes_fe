@@ -274,7 +274,7 @@ export default function Navigation({
                 <div className="flex flex-col gap-2">
                   <Link
                     to="/sightings/submit"
-                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent bg-primary text-primary-foreground"
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Upload className="size-5" />
