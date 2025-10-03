@@ -25,6 +25,7 @@ import {
   ArrowLeft,
   Pencil,
   Trash2,
+  ImageOff,
 } from 'lucide-react';
 import { useAuth } from '~/lib/hooks/use-auth';
 
@@ -41,6 +42,7 @@ export default function SightingDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (!sightingId) {
@@ -184,11 +186,19 @@ export default function SightingDetailPage() {
       {/* 이미지 */}
       <Card>
         <CardContent className="p-0">
-          <img
-            src={imageUrl}
-            alt={sighting.title}
-            className="w-full h-auto max-h-[600px] object-contain rounded-lg"
-          />
+          {imageError || !sighting.media ? (
+            <div className="w-full h-[400px] flex flex-col items-center justify-center bg-gray-100 rounded-lg">
+              <ImageOff className="w-20 h-20 text-gray-400 mb-4" />
+              <p className="text-gray-500 text-sm">이미지를 불러올 수 없습니다</p>
+            </div>
+          ) : (
+            <img
+              src={imageUrl}
+              alt={sighting.title}
+              className="w-full h-auto max-h-[600px] object-contain rounded-lg"
+              onError={() => setImageError(true)}
+            />
+          )}
         </CardContent>
       </Card>
 

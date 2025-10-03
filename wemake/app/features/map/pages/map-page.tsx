@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/common/components/ui/dialog';
-import { SearchIcon, Loader2Icon, XIcon, MapIcon } from 'lucide-react';
+import { SearchIcon, Loader2Icon, XIcon, MapIcon, ImageOff } from 'lucide-react';
 import type { SightingListItem } from '~/lib/types/sighting.types';
 import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
 import { sightingsApi } from '~/lib/api/sightings.api';
@@ -39,15 +39,38 @@ function formatRadius(meters: number): string {
 }
 
 export default function MapPage() {
-  const [sightings, setSightings] = useState<SightingListItem[]>([]);
+  // sessionStorage에서 저장된 상태 복원
+  const getInitialMapState = () => {
+    if (typeof window === 'undefined') return { center: DEFAULT_MAP_CENTER, zoom: 13, sightings: [] };
+
+    const saved = sessionStorage.getItem('mapState');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          center: parsed.center || DEFAULT_MAP_CENTER,
+          zoom: parsed.zoom || 13,
+          sightings: parsed.sightings || [],
+        };
+      } catch {
+        return { center: DEFAULT_MAP_CENTER, zoom: 13, sightings: [] };
+      }
+    }
+    return { center: DEFAULT_MAP_CENTER, zoom: 13, sightings: [] };
+  };
+
+  const initialState = getInitialMapState();
+
+  const [sightings, setSightings] = useState<SightingListItem[]>(initialState.sightings);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedSighting, setSelectedSighting] = useState<SightingListItem | null>(null);
-  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER);
-  const [mapZoom, setMapZoom] = useState(13);
+  const [mapCenter, setMapCenter] = useState(initialState.center);
+  const [mapZoom, setMapZoom] = useState(initialState.zoom);
   const [totalCount, setTotalCount] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   // 지도 중심과 줌 레벨에 따라 nearby API 호출
   const fetchNearbySightings = useCallback(async (lat: number, lng: number, zoom: number) => {
@@ -67,6 +90,16 @@ export default function MapPage() {
       // 응답이 배열로 오므로 직접 설정
       setSightings(response);
       setTotalCount(response.length);
+
+      // sessionStorage에 sightings도 저장
+      if (typeof window !== 'undefined') {
+        const currentState = sessionStorage.getItem('mapState');
+        const parsed = currentState ? JSON.parse(currentState) : {};
+        sessionStorage.setItem('mapState', JSON.stringify({
+          ...parsed,
+          sightings: response,
+        }));
+      }
     } catch (err: any) {
       console.error('Error fetching nearby sightings:', err);
       setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다');
@@ -86,6 +119,11 @@ export default function MapPage() {
   const handleMapMove = useCallback((center: { lat: number; lng: number }, zoom: number) => {
     setMapCenter(center);
     setMapZoom(zoom);
+
+    // sessionStorage에 상태 저장
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mapState', JSON.stringify({ center, zoom }));
+    }
   }, []);
 
   // 현재 위치에서 재검색 버튼 핸들러
@@ -95,6 +133,7 @@ export default function MapPage() {
 
   const handleMarkerClick = (sighting: SightingListItem) => {
     setSelectedSighting(sighting);
+    setImageError(false); // 새 모달 열 때 이미지 에러 상태 초기화
   };
 
   // 위치 정보가 있는 목격 정보만 필터링
@@ -199,74 +238,138 @@ export default function MapPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               {/* 이미지 */}
               <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={selectedSighting.sanitizedUrl}
-                  alt={selectedSighting.title}
-                  className="w-full h-full object-cover"
-                />
+                {imageError || !selectedSighting.sanitizedUrl ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
+                    <ImageOff className="w-16 h-16 text-gray-400 mb-2" />
+                    <p className="text-gray-500 text-sm">이미지를 불러올 수 없습니다</p>
+                  </div>
+                ) : (
+                  <img
+                    src={selectedSighting.sanitizedUrl}
+                    alt={selectedSighting.title}
+                    className="w-full h-full object-cover"
+                    onError={() => setImageError(true)}
+                  />
+                )}
               </div>
 
               {/* 정보 */}
-              <div className="space-y-4">
+              <div className="space-y-3">
+                {/* 동물 정보 섹션 */}
                 {selectedSighting.commonNameKo && (
-                  <div>
-                    <span className="text-sm text-gray-600">동물 이름</span>
-                    <p className="font-medium text-lg">{selectedSighting.commonNameKo}</p>
+                  <div className="pb-3 border-b">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="font-bold text-xl text-blue-700">{selectedSighting.commonNameKo}</p>
+                        {selectedSighting.commonNameEn && (
+                          <p className="text-sm text-gray-500">{selectedSighting.commonNameEn}</p>
+                        )}
+                      </div>
+                      {selectedSighting.status && (
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          selectedSighting.status === 'endangered'
+                            ? 'bg-red-100 text-red-700'
+                            : selectedSighting.status === 'natural_monument'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {selectedSighting.status === 'endangered' && '멸종위기종'}
+                          {selectedSighting.status === 'natural_monument' && '천연기념물'}
+                          {selectedSighting.status === 'general' && '일반'}
+                        </span>
+                      )}
+                    </div>
+                    {selectedSighting.scientificName && (
+                      <p className="text-sm italic text-gray-600">{selectedSighting.scientificName}</p>
+                    )}
                   </div>
                 )}
 
-                {selectedSighting.scientificName && (
-                  <div>
-                    <span className="text-sm text-gray-600">학명</span>
-                    <p className="font-medium italic">{selectedSighting.scientificName}</p>
+                {/* AI 신뢰도 */}
+                {selectedSighting.aiConfidence !== null && selectedSighting.aiConfidence !== undefined && (
+                  <div className="flex items-center justify-between py-2 px-3 bg-blue-50 rounded-lg">
+                    <span className="text-sm font-medium text-blue-900">AI 신뢰도</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-600 rounded-full transition-all"
+                          style={{ width: `${Math.round(selectedSighting.aiConfidence * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-blue-900">
+                        {Math.round(selectedSighting.aiConfidence * 100)}%
+                      </span>
+                    </div>
                   </div>
                 )}
 
-                {selectedSighting.status && (
-                  <div>
-                    <span className="text-sm text-gray-600">보호 등급</span>
-                    <p className="font-medium">
-                      {selectedSighting.status === 'endangered' && '멸종위기종'}
-                      {selectedSighting.status === 'natural_monument' && '천연기념물'}
-                      {selectedSighting.status === 'general' && '일반'}
-                    </p>
+                {/* 검증 상태 */}
+                {selectedSighting.isVerified && (
+                  <div className="flex items-center gap-2 py-2 px-3 bg-green-50 rounded-lg">
+                    <span className="text-green-700 font-semibold text-sm">✓ 전문가 검증 완료</span>
                   </div>
                 )}
 
-                {selectedSighting.aiConfidence !== null && (
-                  <div>
-                    <span className="text-sm text-gray-600">AI 신뢰도</span>
-                    <p className="font-medium">
-                      {Math.round(selectedSighting.aiConfidence * 100)}%
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <span className="text-sm text-gray-600">제보자</span>
-                  <p className="font-medium">{selectedSighting.displayName}</p>
+                {/* 공개/비공개 상태 */}
+                <div className="flex items-center gap-2 py-2 px-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">
+                    {selectedSighting.visibility === 'public' ? '🌐 공개' : '🔒 비공개'}
+                  </span>
                 </div>
 
+                {/* 제보자 */}
+                <div>
+                  <span className="text-xs text-gray-500">제보자</span>
+                  <p className="font-medium text-gray-800">{selectedSighting.displayName}</p>
+                </div>
+
+                {/* 목격 일시 */}
                 {selectedSighting.occurredAt && (
                   <div>
-                    <span className="text-sm text-gray-600">목격 일시</span>
-                    <p className="font-medium">
-                      {new Date(selectedSighting.occurredAt).toLocaleString('ko-KR')}
+                    <span className="text-xs text-gray-500">목격 일시</span>
+                    <p className="font-medium text-gray-800">
+                      {new Date(selectedSighting.occurredAt).toLocaleString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 )}
 
+                {/* 등록일 */}
                 <div>
-                  <span className="text-sm text-gray-600">등록일</span>
-                  <p className="font-medium">
-                    {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR')}
+                  <span className="text-xs text-gray-500">등록일</span>
+                  <p className="text-sm text-gray-700">
+                    {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
                   </p>
                 </div>
 
-                {selectedSighting.description && (
+                {/* 최종 수정일 */}
+                {selectedSighting.updatedAt && selectedSighting.updatedAt !== selectedSighting.createdAt && (
                   <div>
-                    <span className="text-sm text-gray-600">설명</span>
-                    <p className="text-sm mt-1">{selectedSighting.description}</p>
+                    <span className="text-xs text-gray-500">최종 수정</span>
+                    <p className="text-sm text-gray-700">
+                      {new Date(selectedSighting.updatedAt).toLocaleDateString('ko-KR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                )}
+
+                {/* 설명 */}
+                {selectedSighting.description && (
+                  <div className="pt-3 border-t">
+                    <span className="text-xs text-gray-500 block mb-1">상세 설명</span>
+                    <p className="text-sm text-gray-800 leading-relaxed">{selectedSighting.description}</p>
                   </div>
                 )}
 
