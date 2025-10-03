@@ -10,23 +10,37 @@ export interface Sighting {
   detections?: AnimalDetection[];
 }
 
+// Swagger에서 확인한 SightingDetailResponse 기반 타입
 export interface SightingDetail {
-  sightingId: string;
+  id: string;
   title: string;
   description: string | null;
-  aiConfidence: number | null;
-  gpsLocation: GpsLocation | null;
   occurredAt: string | null;
-  createdAt: string;
+  detectedBy: string;
+  aiConfidence: number | null;
   visibility: 'public' | 'private';
+  isVerified: boolean;
+  addressText: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: UserInfo;
+  species: SpeciesInfo | null;
   media: MediaInfo;
-  detections: AnimalDetection[];
-  speciesProcessingStatus: 'PENDING' | 'COMPLETED' | 'NOT_DETECTED';
-  owner: {
-    userId: string;
-    username: string;
-    nickname: string;
-  };
+  geom: string | null; // WKT 문자열: "POINT(126.9784 37.5667)"
+}
+
+export interface UserInfo {
+  id: string;
+  displayName: string;
+  email: string;
+}
+
+export interface SpeciesInfo {
+  id: string;
+  commonNameKo: string | null;
+  commonNameEn: string | null;
+  scientificName: string;
+  status: 'general' | 'endangered' | 'natural_monument' | null;
 }
 
 export interface GpsLocation {
@@ -43,7 +57,7 @@ export interface MediaInfo {
 }
 
 export interface AnimalDetection {
-  detectionId?: string; // 선택 사항으로 변경
+  detectionId?: string;
   scientificName: string;
   commonName: string | null;
   confidence: number;

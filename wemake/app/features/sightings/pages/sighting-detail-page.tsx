@@ -26,7 +26,12 @@ import {
   Pencil,
   Trash2,
   ImageOff,
+  Mail,
+  MapPinned,
+  Shield,
+  CheckCircle2,
 } from 'lucide-react';
+import { parseWKTPoint } from '~/lib/utils/geo.utils';
 import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
@@ -82,7 +87,7 @@ export default function SightingDetailPage() {
     }
   };
 
-  const isOwner = user && sighting && sighting.owner && user.userId === sighting.owner.userId;
+  const isOwner = user && sighting && sighting.user && user.userId === sighting.user.id;
 
   if (isLoading) {
     return (
@@ -107,7 +112,9 @@ export default function SightingDetailPage() {
     );
   }
 
-  const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${sighting.media.mediaId}/download`;
+  const imageUrl = sighting.media?.mediaId
+    ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${sighting.media.mediaId}/download`
+    : null;
 
   return (
     <>
@@ -186,7 +193,7 @@ export default function SightingDetailPage() {
       {/* 이미지 */}
       <Card>
         <CardContent className="p-0">
-          {imageError || !sighting.media ? (
+          {imageError || !imageUrl ? (
             <div className="w-full h-[400px] flex flex-col items-center justify-center bg-gray-100 rounded-lg">
               <ImageOff className="w-20 h-20 text-gray-400 mb-4" />
               <p className="text-gray-500 text-sm">이미지를 불러올 수 없습니다</p>
@@ -202,36 +209,85 @@ export default function SightingDetailPage() {
         </CardContent>
       </Card>
 
-      {/* AI 인식 결과 */}
-      {sighting.detections && sighting.detections.length > 0 && (
+      {/* 종 정보 (Species) */}
+      {sighting.species && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5" />
-              AI 동물 인식 결과
+              <Sparkles className="w-5 h-5 text-amber-600" />
+              동물 정보
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {sighting.detections.map((detection, index) => (
-              <div key={detection.detectionId} className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">
-                    {detection.commonName || detection.scientificName}
-                  </p>
-                  {detection.commonName && detection.scientificName && (
-                    <p className="text-sm text-gray-500 italic">{detection.scientificName}</p>
-                  )}
-                </div>
-                <Badge variant="secondary">
-                  {Math.round(detection.confidence * 100)}% 확신
-                </Badge>
-              </div>
-            ))}
-            {sighting.aiConfidence && (
-              <div className="pt-3 border-t">
-                <p className="text-sm text-gray-500">
-                  평균 신뢰도: {Math.round(sighting.aiConfidence * 100)}%
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm text-gray-600">한글명</span>
+                <p className="font-bold text-xl text-blue-700">
+                  {sighting.species.commonNameKo || '정보 없음'}
                 </p>
+              </div>
+              {sighting.species.commonNameEn && (
+                <div>
+                  <span className="text-sm text-gray-600">영문명</span>
+                  <p className="font-semibold text-lg text-gray-700">
+                    {sighting.species.commonNameEn}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <span className="text-sm text-gray-600">학명</span>
+              <p className="font-medium italic text-gray-800">
+                {sighting.species.scientificName}
+              </p>
+            </div>
+
+            {sighting.species.status && (
+              <div>
+                <span className="text-sm text-gray-600">보호 등급</span>
+                <div className="mt-1">
+                  <Badge
+                    className={
+                      sighting.species.status === 'endangered'
+                        ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                        : sighting.species.status === 'natural_monument'
+                        ? 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }
+                  >
+                    <Shield className="w-3 h-3 mr-1" />
+                    {sighting.species.status === 'endangered' && '멸종위기종'}
+                    {sighting.species.status === 'natural_monument' && '천연기념물'}
+                    {sighting.species.status === 'general' && '일반종'}
+                  </Badge>
+                </div>
+              </div>
+            )}
+
+            {sighting.aiConfidence !== null && (
+              <div className="pt-3 border-t">
+                <span className="text-sm text-gray-600 block mb-2">AI 신뢰도</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all rounded-full"
+                      style={{ width: `${Math.round(sighting.aiConfidence * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-lg font-bold text-blue-700">
+                    {Math.round(sighting.aiConfidence * 100)}%
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {sighting.isVerified && (
+              <div className="pt-3 border-t">
+                <div className="flex items-center gap-2 py-2 px-3 bg-green-50 rounded-lg border border-green-200">
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  <span className="text-green-800 font-semibold">전문가 검증 완료</span>
+                </div>
               </div>
             )}
           </CardContent>
@@ -251,41 +307,155 @@ export default function SightingDetailPage() {
       )}
 
       {/* 위치 정보 */}
-      {sighting.gpsLocation && (
+      {sighting.geom && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
+              <MapPinned className="w-5 h-5 text-red-600" />
               위치 정보
             </CardTitle>
           </CardHeader>
+          <CardContent className="space-y-3">
+            {(() => {
+              const position = parseWKTPoint(sighting.geom);
+              return position ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-600">위도</span>
+                      <p className="font-mono text-sm font-medium">{position.lat.toFixed(6)}</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-600">경도</span>
+                      <p className="font-mono text-sm font-medium">{position.lng.toFixed(6)}</p>
+                    </div>
+                  </div>
+                  {sighting.addressText && (
+                    <div className="pt-3 border-t">
+                      <span className="text-sm text-gray-600 block mb-1">주소</span>
+                      <p className="text-sm text-gray-800">{sighting.addressText}</p>
+                    </div>
+                  )}
+                  <div className="pt-3 border-t">
+                    <a
+                      href={`https://www.google.com/maps?q=${position.lat},${position.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm inline-flex items-center gap-1"
+                    >
+                      <MapPin className="w-4 h-4" />
+                      Google Maps에서 보기 →
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">위치 정보를 파싱할 수 없습니다</p>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 목격 일시 */}
+      {sighting.occurredAt && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-green-600" />
+              목격 일시
+            </CardTitle>
+          </CardHeader>
           <CardContent>
-            <p className="text-sm">
-              위도: {sighting.gpsLocation.latitude}, 경도: {sighting.gpsLocation.longitude}
+            <p className="text-lg font-medium">
+              {new Date(sighting.occurredAt).toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </p>
           </CardContent>
         </Card>
       )}
 
       {/* 작성자 정보 */}
-      {sighting.owner && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              작성자
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5 text-indigo-600" />
+            제보자 정보
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <span className="text-sm text-gray-600">이름</span>
+            <p className="font-semibold text-lg">{sighting.user.displayName}</p>
+          </div>
+          {sighting.user.email && (
+            <div>
+              <span className="text-sm text-gray-600">이메일</span>
+              <p className="text-sm flex items-center gap-2 text-gray-700">
+                <Mail className="w-4 h-4" />
+                {sighting.user.email}
+              </p>
+            </div>
+          )}
+          <div className="pt-3 border-t">
             <Link
-              to={`/users/${sighting.owner.userId}`}
-              className="text-blue-600 hover:underline"
+              to={`/users/${sighting.user.id}`}
+              className="text-blue-600 hover:underline text-sm inline-flex items-center gap-1"
             >
-              {sighting.owner.nickname} (@{sighting.owner.username})
+              프로필 보기 →
             </Link>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 등록 정보 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-gray-600" />
+            등록 정보
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-sm text-gray-600">등록일</span>
+              <p className="text-sm font-medium">
+                {new Date(sighting.createdAt).toLocaleString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-gray-600">최종 수정</span>
+              <p className="text-sm font-medium">
+                {new Date(sighting.updatedAt).toLocaleString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+            </div>
+          </div>
+          {sighting.detectedBy && (
+            <div className="pt-3 border-t">
+              <span className="text-sm text-gray-600">감지 방법</span>
+              <p className="text-sm font-medium text-gray-700">{sighting.detectedBy}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* 수정/삭제 버튼 (본인만 가능) */}
       {isOwner ? (
