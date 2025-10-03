@@ -158,14 +158,14 @@ export default function Navigation({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="/logo.png" />
-                  <AvatarFallback>N</AvatarFallback>
+                  <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                  <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="flex flex-col">
-                  <span className="font-medium">{user?.nickname || '사용자'}</span>
-                  <span className="text-xs text-muted-foreground">@{user?.username || 'username'}</span>
+                  <span className="font-medium">{user?.displayName || '사용자'}</span>
+                  <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -212,12 +212,12 @@ export default function Navigation({
                 {/* User Info - Mobile */}
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <Avatar>
-                    <AvatarImage src="/logo.png" />
-                    <AvatarFallback>{user?.nickname?.[0] || 'U'}</AvatarFallback>
+                    <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                    <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium">{user?.nickname || '사용자'}</span>
-                    <span className="text-xs text-muted-foreground">@{user?.username || 'username'}</span>
+                    <span className="font-medium">{user?.displayName || '사용자'}</span>
+                    <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                   </div>
                 </div>
 
