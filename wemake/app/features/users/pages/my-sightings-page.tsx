@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { type MetaFunction, Link } from 'react-router';
-import { useMyMedias } from '~/features/sightings/hooks/use-my-medias';
-import { MediaGrid } from '~/features/sightings/components/media-grid';
 import { Button } from '~/common/components/ui/button';
 import { useAuth } from '~/lib/hooks/use-auth';
+import { sightingsApi } from '~/lib/api/sightings.api';
+import type { SightingListItem } from '~/lib/types/sighting.types';
+import { SightingListCard } from '~/features/sightings/components/sighting-list-card';
+import { Loader2 } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [{ title: '내 목격 정보 | 셔터 히어로즈' }];
@@ -11,12 +13,74 @@ export const meta: MetaFunction = () => {
 
 export default function MySightingsPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const { medias, isLoading, error, fetchMyMedias } = useMyMedias();
+  const [sightings, setSightings] = useState<SightingListItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const loadSightings = useCallback(async (page: number) => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await sightingsApi.getMySightings({
+        page,
+        size: 20,
+      });
+
+      if (page === 0) {
+        setSightings(response.content);
+      } else {
+        setSightings((prev) => [...prev, ...response.content]);
+      }
+
+      setHasMore(!response.last);
+      setCurrentPage(page);
+    } catch (err: any) {
+      console.error('내 목격 정보 조회 실패:', err);
+      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
-    fetchMyMedias({ page: currentPage, size: 20 });
-  }, [currentPage, fetchMyMedias]);
+    if (user && !authLoading) {
+      loadSightings(0);
+    }
+  }, [user, authLoading]);
+
+  useEffect(() => {
+    if (!hasMore || isLoading) return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadSightings(currentPage + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoading, currentPage, loadSightings]);
 
   if (authLoading) {
     return (
@@ -39,15 +103,7 @@ export default function MySightingsPage() {
     );
   }
 
-  if (isLoading && !medias) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-gray-500">로딩 중...</p>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (error && sightings.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <p className="text-red-500">{error}</p>
@@ -56,40 +112,44 @@ export default function MySightingsPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6">
+    <div className="container mx-auto space-y-6 py-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">내 목격 정보</h1>
       </div>
 
-      {medias && medias.content.length > 0 ? (
+      {sightings.length > 0 ? (
         <>
-          <MediaGrid medias={medias.content} />
-
-          <div className="flex items-center justify-center gap-2 mt-6">
-            <Button
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-              disabled={medias.first || isLoading}
-              variant="outline"
-            >
-              이전
-            </Button>
-            <span className="text-sm text-gray-600">
-              {currentPage + 1} / {medias.totalPages}
-            </span>
-            <Button
-              onClick={() => setCurrentPage((p) => p + 1)}
-              disabled={medias.last || isLoading}
-              variant="outline"
-            >
-              다음
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {sightings.map((sighting) => (
+              <SightingListCard key={sighting.id} sighting={sighting} />
+            ))}
           </div>
+
+          {hasMore && (
+            <div ref={loadMoreRef} className="flex items-center justify-center py-8">
+              {isLoading && (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin text-gray-500 mr-2" />
+                  <span className="text-gray-600">로딩 중...</span>
+                </>
+              )}
+            </div>
+          )}
+
+          {!hasMore && sightings.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">모든 목격 정보를 불러왔습니다.</p>
+            </div>
+          )}
         </>
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-gray-500">아직 등록한 목격 정보가 없습니다.</p>
+          <Button asChild className="mt-4">
+            <Link to="/sightings/submit">목격 정보 등록하기</Link>
+          </Button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

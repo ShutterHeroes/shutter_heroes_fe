@@ -78,4 +78,18 @@ export const sightingsApi = {
       },
     });
   },
+
+  /**
+   * 내가 제보한 Sighting 목록 조회 (페이지네이션, 검색, 인증 필요)
+   */
+  getMySightings: async (params: GetSightingsParams = {}): Promise<SightingListResponse> => {
+    return apiClient.get('/api/v1/sightings/my', {
+      params: {
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+        sort: params.sort ?? ['createdAt,DESC'],
+        keyword: params.keyword,
+      },
+    });
+  },
 };
