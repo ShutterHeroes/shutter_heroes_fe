@@ -21,8 +21,10 @@ export default [
     route("/submit", "features/sightings/pages/submit-sighting-page.tsx"),
     route("/:sightingId", "features/sightings/pages/sighting-detail-page.tsx"),
     route("/:sightingId/edit", "features/sightings/pages/edit-sighting-page.tsx"),
-    // route("/map", "features/sightings/pages/map-page.tsx"),
   ]),
+
+  // 지도
+  route("/map", "features/map/pages/map-page.tsx"),
 
   // 사용자
   ...prefix("/users", [

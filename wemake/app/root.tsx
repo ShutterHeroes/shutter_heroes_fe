@@ -26,6 +26,12 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nanum+Brush+Script&display=swap",
   },
   { rel: "stylesheet", href: stylesheet },
+  {
+    rel: "stylesheet",
+    href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+    integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
+    crossOrigin: "anonymous",
+  },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

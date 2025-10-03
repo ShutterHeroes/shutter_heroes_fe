@@ -48,6 +48,10 @@ const menus = [
     to: "/sightings",
   },
   {
+    name: "지도",
+    to: "/map",
+  },
+  {
     name: "사용자",
     to: "/users",
   },

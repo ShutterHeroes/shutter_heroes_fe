@@ -1,0 +1,122 @@
+import { useEffect, useRef, useState } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import type { SightingListItem } from '~/lib/types/sighting.types';
+import { parseWKTPoint, DEFAULT_MAP_CENTER, DEFAULT_ZOOM } from '~/lib/utils/geo.utils';
+
+// Leaflet 기본 아이콘 수정 (빌드 시 아이콘 경로 문제 해결)
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+interface SightingMapClientProps {
+  sightings: SightingListItem[];
+  center?: { lat: number; lng: number };
+  zoom?: number;
+  height?: string;
+  onMarkerClick?: (sighting: SightingListItem) => void;
+}
+
+export function SightingMapClient({
+  sightings,
+  center = DEFAULT_MAP_CENTER,
+  zoom = DEFAULT_ZOOM,
+  height = '600px',
+  onMarkerClick,
+}: SightingMapClientProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+
+  // 지도 초기화
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    // 지도 생성
+    const map = L.map(mapRef.current).setView([center.lat, center.lng], zoom);
+
+    // OpenStreetMap 타일 추가
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    mapInstanceRef.current = map;
+
+    // 클린업
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [center.lat, center.lng, zoom]);
+
+  // 마커 업데이트
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // 기존 마커 제거
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    // 새 마커 추가
+    const newMarkers: L.Marker[] = [];
+    const bounds: L.LatLngBounds[] = [];
+
+    sightings.forEach((sighting) => {
+      const position = parseWKTPoint(sighting.geom);
+      if (!position) return;
+
+      const marker = L.marker([position.lat, position.lng]);
+
+      // 팝업 내용
+      const popupContent = `
+        <div class="p-2 min-w-[200px]">
+          <h3 class="font-semibold text-base mb-1">${sighting.title}</h3>
+          ${
+            sighting.commonNameKo
+              ? `<p class="text-sm text-gray-700 mb-1">🦊 ${sighting.commonNameKo}</p>`
+              : ''
+          }
+          ${
+            sighting.aiConfidence
+              ? `<p class="text-xs text-gray-500">AI 신뢰도: ${Math.round(sighting.aiConfidence * 100)}%</p>`
+              : ''
+          }
+          <p class="text-xs text-gray-500 mt-1">by ${sighting.displayName}</p>
+          <a
+            href="/sightings/${sighting.id}"
+            class="text-blue-600 hover:underline text-sm mt-2 inline-block"
+          >
+            상세 보기 →
+          </a>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent);
+
+      // 클릭 이벤트
+      if (onMarkerClick) {
+        marker.on('click', () => onMarkerClick(sighting));
+      }
+
+      marker.addTo(mapInstanceRef.current!);
+      newMarkers.push(marker);
+      bounds.push(L.latLngBounds([position.lat, position.lng], [position.lat, position.lng]));
+    });
+
+    markersRef.current = newMarkers;
+
+    // 모든 마커가 보이도록 지도 조정
+    if (bounds.length > 0 && newMarkers.length > 1) {
+      const group = L.featureGroup(newMarkers);
+      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
+    }
+  }, [sightings, onMarkerClick]);
+
+  return <div ref={mapRef} style={{ height, width: '100%' }} className="rounded-lg shadow-md" />;
+}
