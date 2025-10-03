@@ -4,9 +4,9 @@ import { Button } from '../components/ui/button';
 import { Link } from 'react-router';
 import { BlurFade } from '~/common/components/ui/blur-fade';
 import { Card, CardContent } from '../components/ui/card';
-import { mediaApi } from '~/lib/api/media.api';
-import type { Media } from '~/lib/types/media.types';
-import { MediaGrid } from '~/features/sightings/components/media-grid';
+import { sightingsApi } from '~/lib/api/sightings.api';
+import type { SightingListItem } from '~/lib/types/sighting.types';
+import { SightingListCard } from '~/features/sightings/components/sighting-list-card';
 import { Upload, Sparkles, Users, TrendingUp, ArrowRight, Map } from 'lucide-react';
 
 export const meta: Route.MetaFunction = () => {
@@ -17,14 +17,14 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export default function HomePage() {
-  const [recentMedia, setRecentMedia] = useState<Media[]>([]);
+  const [recentSightings, setRecentSightings] = useState<SightingListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecentMedia = async () => {
+    const fetchRecentSightings = async () => {
       try {
-        const response = await mediaApi.browse({ page: 0, size: 8 });
-        setRecentMedia(response.content);
+        const response = await sightingsApi.getAll({ page: 0, size: 8 });
+        setRecentSightings(response.content);
       } catch (err) {
         console.error('최근 목격 정보 조회 에러:', err);
       } finally {
@@ -32,7 +32,7 @@ export default function HomePage() {
       }
     };
 
-    fetchRecentMedia();
+    fetchRecentSightings();
   }, []);
 
   return (
@@ -149,8 +149,12 @@ export default function HomePage() {
                 <div key={i} className="aspect-square bg-gray-200 animate-pulse rounded-lg" />
               ))}
             </div>
-          ) : recentMedia.length > 0 ? (
-            <MediaGrid medias={recentMedia} />
+          ) : recentSightings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {recentSightings.map((sighting) => (
+                <SightingListCard key={sighting.id} sighting={sighting} />
+              ))}
+            </div>
           ) : (
             <Card>
               <CardContent className="p-8 text-center text-gray-500">

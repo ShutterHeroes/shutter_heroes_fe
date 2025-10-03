@@ -11,7 +11,8 @@ interface MediaCardProps {
 
 export function MediaCard({ media }: MediaCardProps) {
   const [imageError, setImageError] = useState(false);
-  const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${media.mediaId}/download`;
+  // storagePath에 이미 S3 URL이 포함되어 있음
+  const imageUrl = media.storagePath;
   const createdDate = new Date(media.createdAt).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',

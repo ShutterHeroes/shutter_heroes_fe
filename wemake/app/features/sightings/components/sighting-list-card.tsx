@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent } from '~/common/components/ui/card';
 import { Badge } from '~/common/components/ui/badge';
@@ -10,6 +11,7 @@ import {
   ShieldCheckIcon,
   AlertTriangleIcon,
   UserIcon,
+  ImageOff,
 } from 'lucide-react';
 
 interface SightingListCardProps {
@@ -17,7 +19,8 @@ interface SightingListCardProps {
 }
 
 export function SightingListCard({ sighting }: SightingListCardProps) {
-  const imageUrl = `${import.meta.env.VITE_API_BASE_URL}${sighting.sanitizedUrl}`;
+  const [imageError, setImageError] = useState(false);
+  const imageUrl = sighting.sanitizedUrl || sighting.storagePath;
   const createdDate = new Date(sighting.createdAt).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
@@ -28,12 +31,20 @@ export function SightingListCard({ sighting }: SightingListCardProps) {
     <Link to={`/sightings/${sighting.id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
-          <img
-            src={imageUrl}
-            alt={sighting.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
+          {imageError || !imageUrl ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 text-gray-400">
+              <ImageOff className="w-12 h-12 mb-2" />
+              <span className="text-sm">이미지 없음</span>
+            </div>
+          ) : (
+            <img
+              src={imageUrl}
+              alt={sighting.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              onError={() => setImageError(true)}
+            />
+          )}
 
           {/* 상단 우측 배지들 */}
           <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">

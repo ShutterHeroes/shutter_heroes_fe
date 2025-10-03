@@ -112,9 +112,8 @@ export default function SightingDetailPage() {
     );
   }
 
-  const imageUrl = sighting.media?.mediaId
-    ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/medias/${sighting.media.mediaId}/download`
-    : null;
+  // media.sanitizedUrl, url, storagePath 중 하나에 S3 URL이 포함되어 있음
+  const imageUrl = sighting.media?.sanitizedUrl || sighting.media?.url || sighting.media?.storagePath || null;
 
   return (
     <>

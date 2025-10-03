@@ -49,11 +49,22 @@ export interface GpsLocation {
 }
 
 export interface MediaInfo {
-  mediaId: string;
-  storagePath: string;
+  mediaId?: string;
+  id?: string; // 백엔드 응답에서는 id 사용
+  sanitizedUrl?: string; // 개인정보 제거된 이미지 URL
+  storagePath?: string | null; // 원본 이미지 URL
+  url?: string; // 일부 API에서 사용
   mimeType: string;
   width: number | null;
   height: number | null;
+  bytes?: number;
+  exif?: {
+    cameraMake: string | null;
+    cameraModel: string | null;
+    capturedAt: string | null;
+    gpsLatitude: number | null;
+    gpsLongitude: number | null;
+  };
 }
 
 export interface AnimalDetection {
