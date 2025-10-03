@@ -80,7 +80,7 @@ export default function SightingDetailPage() {
     }
   };
 
-  const isOwner = user && sighting && user.userId === sighting.owner.userId;
+  const isOwner = user && sighting && sighting.owner && user.userId === sighting.owner.userId;
 
   if (isLoading) {
     return (
@@ -193,7 +193,7 @@ export default function SightingDetailPage() {
       </Card>
 
       {/* AI 인식 결과 */}
-      {sighting.detections.length > 0 && (
+      {sighting.detections && sighting.detections.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -258,22 +258,24 @@ export default function SightingDetailPage() {
       )}
 
       {/* 작성자 정보 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            작성자
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Link
-            to={`/users/${sighting.owner.userId}`}
-            className="text-blue-600 hover:underline"
-          >
-            {sighting.owner.nickname} (@{sighting.owner.username})
-          </Link>
-        </CardContent>
-      </Card>
+      {sighting.owner && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              작성자
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Link
+              to={`/users/${sighting.owner.userId}`}
+              className="text-blue-600 hover:underline"
+            >
+              {sighting.owner.nickname} (@{sighting.owner.username})
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 수정/삭제 버튼 (본인만 가능) */}
       {isOwner ? (

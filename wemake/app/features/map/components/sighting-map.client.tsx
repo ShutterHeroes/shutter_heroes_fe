@@ -33,7 +33,7 @@ export function SightingMapClient({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
 
-  // 지도 초기화
+  // 지도 초기화 (한 번만 실행)
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
@@ -101,19 +101,6 @@ export function SightingMapClient({
       })
       .addTo(map);
 
-    // 지도 이동/확대 이벤트 리스너
-    if (onMapMove) {
-      const handleMoveEnd = () => {
-        const center = map.getCenter();
-        const zoom = map.getZoom();
-        onMapMove({ lat: center.lat, lng: center.lng }, zoom);
-      };
-
-      // moveend: 드래그나 확대/축소가 끝났을 때 발생
-      map.on('moveend', handleMoveEnd);
-      map.on('zoomend', handleMoveEnd);
-    }
-
     mapInstanceRef.current = map;
 
     // 클린업
@@ -123,13 +110,33 @@ export function SightingMapClient({
         mapInstanceRef.current = null;
       }
     };
-  }, [center.lat, center.lng, zoom, onMapMove]);
+  }, []); // 한 번만 실행 - center, zoom 변경 시 재생성하지 않음
+
+  // 지도 이동/확대 이벤트 리스너 등록
+  useEffect(() => {
+    if (!mapInstanceRef.current || !onMapMove) return;
+
+    const handleMoveEnd = () => {
+      const center = mapInstanceRef.current!.getCenter();
+      const zoom = mapInstanceRef.current!.getZoom();
+      onMapMove({ lat: center.lat, lng: center.lng }, zoom);
+    };
+
+    // moveend: 드래그나 확대/축소가 끝났을 때 발생
+    mapInstanceRef.current.on('moveend', handleMoveEnd);
+    mapInstanceRef.current.on('zoomend', handleMoveEnd);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.off('moveend', handleMoveEnd);
+        mapInstanceRef.current.off('zoomend', handleMoveEnd);
+      }
+    };
+  }, [onMapMove]);
 
   // 마커 업데이트
   useEffect(() => {
     if (!mapInstanceRef.current) return;
-
-    console.log('[MapClient] Updating markers, sightings count:', sightings.length);
 
     // 기존 마커 제거
     markersRef.current.forEach((marker) => marker.remove());
@@ -141,10 +148,7 @@ export function SightingMapClient({
 
     sightings.forEach((sighting) => {
       const position = parseWKTPoint(sighting.geom);
-      if (!position) {
-        console.warn('[MapClient] No position for sighting:', sighting.id, 'geom:', sighting.geom);
-        return;
-      }
+      if (!position) return;
 
       const marker = L.marker([position.lat, position.lng]);
 
@@ -184,15 +188,15 @@ export function SightingMapClient({
       bounds.push(L.latLngBounds([position.lat, position.lng], [position.lat, position.lng]));
     });
 
-    console.log('[MapClient] Total markers created and added to map:', newMarkers.length);
     markersRef.current = newMarkers;
+    console.log('[MapClient] Markers on map:', newMarkers.length);
 
-    // 모든 마커가 보이도록 지도 조정
-    if (bounds.length > 0 && newMarkers.length > 1) {
-      const group = L.featureGroup(newMarkers);
-      mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
-    }
+    // 지도 자동 이동 제거 - 사용자가 선택한 위치 유지
+    // if (bounds.length > 0 && newMarkers.length > 1) {
+    //   const group = L.featureGroup(newMarkers);
+    //   mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
+    // }
   }, [sightings, onMarkerClick]);
 
-  return <div ref={mapRef} style={{ height, width: '100%' }} className="rounded-lg shadow-md" />;
+  return <div ref={mapRef} style={{ height, width: '100%', position: 'relative', zIndex: 0 }} className="rounded-lg shadow-md" />;
 }

@@ -5,6 +5,12 @@ import { type MetaFunction } from 'react-router';
 import { SightingMap } from '../components/sighting-map';
 import { Button } from '~/common/components/ui/button';
 import { Input } from '~/common/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '~/common/components/ui/dialog';
 import { SearchIcon, Loader2Icon, XIcon, MapIcon } from 'lucide-react';
 import type { SightingListItem } from '~/lib/types/sighting.types';
 import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
@@ -56,8 +62,7 @@ export default function MapPage() {
         radiusMeters: radiusMeters,
       });
 
-      console.log('[Map] Nearby API response:', response);
-      console.log('[Map] Sample sighting:', response[0]);
+      console.log('[Map] Nearby API response:', response.length, 'sightings loaded');
 
       // 응답이 배열로 오므로 직접 설정
       setSightings(response);
@@ -95,13 +100,8 @@ export default function MapPage() {
   // 위치 정보가 있는 목격 정보만 필터링
   const sightingsWithLocation = sightings.filter((s) => {
     const position = parseWKTPoint(s.geom);
-    if (!position && s.geom) {
-      console.warn('[Map] Failed to parse geom:', s.geom, 'for sighting:', s.id);
-    }
     return position !== null;
   });
-
-  console.log('[Map] Total sightings:', sightings.length, 'With location:', sightingsWithLocation.length);
 
   if (error) {
     return (
@@ -188,78 +188,100 @@ export default function MapPage() {
         )}
       </div>
 
-      {/* 선택된 목격 정보 상세 */}
+      {/* 선택된 목격 정보 상세 - 모달 */}
       {selectedSighting && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <div className="flex items-start justify-between mb-4">
-            <h2 className="text-xl font-semibold">{selectedSighting.title}</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedSighting(null)}
-            >
-              <XIcon className="w-4 h-4" />
-            </Button>
-          </div>
+        <Dialog open={true} onOpenChange={(open) => !open && setSelectedSighting(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">{selectedSighting.title}</DialogTitle>
+            </DialogHeader>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 이미지 */}
-            <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={selectedSighting.sanitizedUrl}
-                alt={selectedSighting.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              {/* 이미지 */}
+              <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={selectedSighting.sanitizedUrl}
+                  alt={selectedSighting.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-            {/* 정보 */}
-            <div className="space-y-3">
-              {selectedSighting.commonNameKo && (
+              {/* 정보 */}
+              <div className="space-y-4">
+                {selectedSighting.commonNameKo && (
+                  <div>
+                    <span className="text-sm text-gray-600">동물 이름</span>
+                    <p className="font-medium text-lg">{selectedSighting.commonNameKo}</p>
+                  </div>
+                )}
+
+                {selectedSighting.scientificName && (
+                  <div>
+                    <span className="text-sm text-gray-600">학명</span>
+                    <p className="font-medium italic">{selectedSighting.scientificName}</p>
+                  </div>
+                )}
+
+                {selectedSighting.status && (
+                  <div>
+                    <span className="text-sm text-gray-600">보호 등급</span>
+                    <p className="font-medium">
+                      {selectedSighting.status === 'endangered' && '멸종위기종'}
+                      {selectedSighting.status === 'natural_monument' && '천연기념물'}
+                      {selectedSighting.status === 'general' && '일반'}
+                    </p>
+                  </div>
+                )}
+
+                {selectedSighting.aiConfidence !== null && (
+                  <div>
+                    <span className="text-sm text-gray-600">AI 신뢰도</span>
+                    <p className="font-medium">
+                      {Math.round(selectedSighting.aiConfidence * 100)}%
+                    </p>
+                  </div>
+                )}
+
                 <div>
-                  <span className="text-sm text-gray-600">동물 이름:</span>
-                  <p className="font-medium">{selectedSighting.commonNameKo}</p>
+                  <span className="text-sm text-gray-600">제보자</span>
+                  <p className="font-medium">{selectedSighting.displayName}</p>
                 </div>
-              )}
 
-              {selectedSighting.scientificName && (
-                <div>
-                  <span className="text-sm text-gray-600">학명:</span>
-                  <p className="font-medium italic">{selectedSighting.scientificName}</p>
-                </div>
-              )}
+                {selectedSighting.occurredAt && (
+                  <div>
+                    <span className="text-sm text-gray-600">목격 일시</span>
+                    <p className="font-medium">
+                      {new Date(selectedSighting.occurredAt).toLocaleString('ko-KR')}
+                    </p>
+                  </div>
+                )}
 
-              {selectedSighting.aiConfidence && (
                 <div>
-                  <span className="text-sm text-gray-600">AI 신뢰도:</span>
+                  <span className="text-sm text-gray-600">등록일</span>
                   <p className="font-medium">
-                    {Math.round(selectedSighting.aiConfidence * 100)}%
+                    {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR')}
                   </p>
                 </div>
-              )}
 
-              <div>
-                <span className="text-sm text-gray-600">제보자:</span>
-                <p className="font-medium">{selectedSighting.displayName}</p>
+                {selectedSighting.description && (
+                  <div>
+                    <span className="text-sm text-gray-600">설명</span>
+                    <p className="text-sm mt-1">{selectedSighting.description}</p>
+                  </div>
+                )}
+
+                <Button
+                  className="w-full mt-4"
+                  onClick={() => {
+                    window.location.href = `/sightings/${selectedSighting.id}`;
+                  }}
+                >
+                  상세 페이지로 이동 →
+                </Button>
               </div>
-
-              <div>
-                <span className="text-sm text-gray-600">등록일:</span>
-                <p className="font-medium">
-                  {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR')}
-                </p>
-              </div>
-
-              <Button
-                className="w-full mt-4"
-                onClick={() => {
-                  window.location.href = `/sightings/${selectedSighting.id}`;
-                }}
-              >
-                상세 보기 →
-              </Button>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

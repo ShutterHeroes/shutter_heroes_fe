@@ -85,6 +85,12 @@ export interface UpdateSightingResponse {
   updatedAt: string;
 }
 
+// GeoJSON Point 타입
+export interface GeoJsonPoint {
+  type: 'Point';
+  coordinates: [number, number]; // [longitude, latitude]
+}
+
 // Sighting 목록 조회용 타입
 export interface SightingListItem {
   id: string;
@@ -103,7 +109,7 @@ export interface SightingListItem {
   scientificName: string | null;
   status: 'general' | 'endangered' | 'natural_monument' | null;
   sanitizedUrl: string;
-  geom: string | null; // WKT 형식: "POINT(126.9784 37.5667)"
+  geom: GeoJsonPoint | string | null; // GeoJSON Point 객체 또는 WKT 문자열: "POINT(126.9784 37.5667)"
 }
 
 export interface SightingListResponse {
