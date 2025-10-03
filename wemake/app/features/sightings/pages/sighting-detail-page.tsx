@@ -91,7 +91,7 @@ export default function SightingDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
+      <div className="container mx-auto max-w-4xl px-4 md:px-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
         </div>
@@ -101,7 +101,7 @@ export default function SightingDetailPage() {
 
   if (error || !sighting) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
+      <div className="container mx-auto max-w-4xl px-4 md:px-8">
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-red-600 mb-4">{error || '목격 정보를 찾을 수 없습니다.'}</p>
@@ -152,7 +152,7 @@ export default function SightingDetailPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="container mx-auto max-w-4xl py-8 space-y-6">
+      <div className="container mx-auto max-w-4xl px-4 md:px-8 space-y-6">
       {/* 뒤로 가기 버튼 */}
       <Button variant="ghost" onClick={() => navigate('/sightings')}>
         <ArrowLeft className="w-4 h-4 mr-2" />

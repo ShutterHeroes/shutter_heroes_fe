@@ -112,7 +112,7 @@ export default function MySightingsPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 py-8">
+    <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">내 목격 정보</h1>
       </div>

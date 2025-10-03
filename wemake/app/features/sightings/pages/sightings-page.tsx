@@ -109,7 +109,7 @@ export default function SightingsPage() {
 
   if (error && sightings.length === 0) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 md:px-8 lg:px-20">
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
           <p className="text-red-500">{error}</p>
           <Button onClick={() => loadSightings(0)}>
@@ -121,7 +121,7 @@ export default function SightingsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       {/* 헤더 및 검색 */}
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold">동물 목격 정보</h1>

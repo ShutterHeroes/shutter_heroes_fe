@@ -184,7 +184,7 @@ export default function MapPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 md:px-8 lg:px-20">
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
           <p className="text-red-500">{error}</p>
           <Button onClick={() => fetchNearbySightings(mapCenter.lat, mapCenter.lng, mapZoom)}>
@@ -196,7 +196,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       {/* 헤더 */}
       <div className="flex items-center gap-3">
         <MapIcon className="w-8 h-8 text-blue-600" />
