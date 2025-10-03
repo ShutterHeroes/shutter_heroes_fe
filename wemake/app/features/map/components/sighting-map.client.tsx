@@ -38,11 +38,57 @@ export function SightingMapClient({
     // 지도 생성
     const map = L.map(mapRef.current).setView([center.lat, center.lng], zoom);
 
-    // OpenStreetMap 타일 추가
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 다양한 타일 레이어 정의
+    const openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19,
-    }).addTo(map);
+    });
+
+    const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors, © CARTO',
+      maxZoom: 19,
+    });
+
+    const lightMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors, © CARTO',
+      maxZoom: 19,
+    });
+
+    const satellite = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: '© Esri',
+        maxZoom: 19,
+      }
+    );
+
+    const topoMap = L.tileLayer(
+      'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      {
+        attribution: '© OpenTopoMap contributors',
+        maxZoom: 17,
+      }
+    );
+
+    const voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors, © CARTO',
+      maxZoom: 19,
+    });
+
+    // 기본 타일 추가
+    openStreetMap.addTo(map);
+
+    // 레이어 컨트롤 추가
+    const baseMaps = {
+      '기본 지도': openStreetMap,
+      '심플 (밝음)': lightMap,
+      '보이저': voyager,
+      '다크 모드': darkMap,
+      '위성 사진': satellite,
+      '지형 지도': topoMap,
+    };
+
+    L.control.layers(baseMaps).addTo(map);
 
     mapInstanceRef.current = map;
 
