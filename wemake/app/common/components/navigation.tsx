@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Separator } from "~/common/components/ui/separator";
 import {
   NavigationMenu,
@@ -37,43 +37,23 @@ import {
   UserIcon,
   MenuIcon,
   ChevronRightIcon,
+  Upload,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "~/lib/hooks/use-auth";
 
 const menus = [
   {
-    name: "사진제출",
-    to: "/picture-submit/submit-picture-page",
+    name: "목격 정보",
+    to: "/sightings",
   },
   {
     name: "지도",
-    to: "/map/map",
+    to: "/map",
   },
   {
-    name: "검색",
-    description: "사진을 검색하세요",
-    to: "/pictures/search",
-  },
-  {
-    name: "사진",
-    to: "/pictures",
-    items: [
-      {
-        name: "리더보드",
-        description: "커뮤니티의 최고 성과자들을 확인하세요",
-        to: "/pictures/leaderboards",
-      },
-      {
-        name: "카테고리",
-        description: "커뮤니티의 최고 카테고리들을 확인하세요",
-        to: "/pictures/categories",
-      },
-      {
-        name: "홍보",
-        description: "커뮤니티에 사진을 홍보하세요",
-        to: "/pictures/promote",
-      },
-    ],
+    name: "사용자",
+    to: "/users",
   },
 ];
 
@@ -87,6 +67,13 @@ export default function Navigation({
   hasMessages: boolean;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   return (
     <nav className="flex px-4 md:px-8 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50 border-b">
@@ -151,6 +138,11 @@ export default function Navigation({
       {/* Right Side Actions */}
       {isLoggedIn ? (
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Submit Button */}
+          <Button asChild size="sm" className="hidden md:flex">
+            <Link to="/sightings/submit">등록하기</Link>
+          </Button>
+
           {/* Messages - Hidden on smallest screens */}
           <Button size="icon" variant="ghost" asChild className="relative hidden sm:flex">
             <Link to="/my/messages">
@@ -166,21 +158,21 @@ export default function Navigation({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="/logo.png" />
-                  <AvatarFallback>N</AvatarFallback>
+                  <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                  <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel className="flex flex-col">
-                  <span className="font-medium">홍길동</span>
-                  <span className="text-xs text-muted-foreground">@사용자명</span>
+                  <span className="font-medium">{user?.displayName || '사용자'}</span>
+                  <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/my/dashboard">
+                    <Link to="/my/sightings">
                       <BarChart3Icon className="size-4 mr-2" />
-                      대시보드
+                      내 목격 정보
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -197,11 +189,9 @@ export default function Navigation({
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to="/auth/logout">
-                    <LogOutIcon className="size-4 mr-2" />
-                    로그아웃
-                  </Link>
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <LogOutIcon className="size-4 mr-2" />
+                  로그아웃
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -222,12 +212,12 @@ export default function Navigation({
                 {/* User Info - Mobile */}
                 <div className="flex items-center gap-3 pb-4 border-b">
                   <Avatar>
-                    <AvatarImage src="/logo.png" />
-                    <AvatarFallback>N</AvatarFallback>
+                    <AvatarImage src={user?.avatarUrl || "/logo.png"} />
+                    <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium">홍길동</span>
-                    <span className="text-xs text-muted-foreground">@사용자명</span>
+                    <span className="font-medium">{user?.displayName || '사용자'}</span>
+                    <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                   </div>
                 </div>
 
@@ -283,12 +273,20 @@ export default function Navigation({
                 {/* User Actions */}
                 <div className="flex flex-col gap-2">
                   <Link
-                    to="/my/dashboard"
+                    to="/sightings/submit"
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Upload className="size-5" />
+                    <span>등록하기</span>
+                  </Link>
+                  <Link
+                    to="/my/sightings"
                     className="flex items-center gap-3 p-3 rounded-md hover:bg-accent"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <BarChart3Icon className="size-5" />
-                    <span>대시보드</span>
+                    <span>내 목격 정보</span>
                   </Link>
                   <Link
                     to="/my/profile"
@@ -306,14 +304,13 @@ export default function Navigation({
                     <SettingsIcon className="size-5" />
                     <span>설정</span>
                   </Link>
-                  <Link
-                    to="/auth/logout"
-                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent text-destructive"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <button
+                    className="flex items-center gap-3 p-3 rounded-md hover:bg-accent text-destructive w-full text-left"
+                    onClick={handleLogout}
                   >
                     <LogOutIcon className="size-5" />
                     <span>로그아웃</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </SheetContent>

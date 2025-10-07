@@ -1,0 +1,1565 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Shutter Heroes API",
+        "description": "Shutter Heroes \u8adb\uae46\ubfcf\udceb\ubc76 API \u81fe\uba84\uaf4c",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "\u6fe1\uc496\ube84 \u5a9b\uc495\ucefb \udcec\uaf4c\u8e30\udc84"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Sighting",
+            "description": "\udceb\ub8de\u81fe\udcbc \uf9cf\u2477\uaebd \udcec\uc819\u8e42\udcb4 API"
+        },
+        {
+            "name": "User",
+            "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 \u613f\udc80\udceb\uc834 API"
+        },
+        {
+            "name": "AI",
+            "description": "AI \u6e72\uacd5\ucef2 \udceb\ub8de\u81fe\udcbc \udcec\uc524\udcec\ub587 \u8adb\udc8f \udcec\uc819\u8e42\udcb4 \udcec\uc823\u6028\udcb5 API"
+        }
+    ],
+    "paths": {
+        "/api/v1/users/me": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udceb\uad79\udcec\uc4fd \udcec\uc819\u8e42\udcb4 \u8b70\uace0\uc276",
+                "description": "\u6fe1\uc493\ub807\udcec\uc524\udced\ube33 \udcec\uad97\udcec\uc29c\udcec\uc604\udcec\uc4fd \udced\ubd3d\u6fe1\uc497\ube18 \udcec\uc819\u8e42\udcb4 \u8b70\uace0\uc276 (JWT \udced\ub117\udced\uac99 \udced\ube18\udcec\uc282)",
+                "operationId": "getMyProfile",
+                "responses": {
+                    "401": {
+                        "description": "\udcec\uc524\uf9dd\udc9d \udcec\ub58e\udced\ub663 (JWT \udced\ub117\udced\uac99 \udcec\ubfbe\udcec\uc4ec \udceb\uc089\udceb\ub497 \udcec\uc440\udced\uc29a\udced\ube2f\uf9de\udc80 \udcec\ube21\udcec\uc4ec)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "\udced\ubd3d\u6fe1\uc497\ube18 \u8b70\uace0\uc276 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserProfileResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udceb\uad79\udcec\uc4fd \udcec\uc819\u8e42\udcb4 \udcec\ub2d4\udcec\uc819",
+                "description": "\u6fe1\uc493\ub807\udcec\uc524\udced\ube33 \udcec\uad97\udcec\uc29c\udcec\uc604\udcec\uc4fd \udced\ubd3d\u6fe1\uc497\ube18 \udcec\uc819\u8e42\udcb4 \udcec\ub2d4\udcec\uc819 (displayName, avatarUrl\uf9cd\udc8c \udcec\ub2d4\udcec\uc819 \u5a9b\udc80\udceb\ub4ab)",
+                "operationId": "updateMyProfile",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserUpdateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc440\udced\uc29a\udcec\uaf66 \u5bc3\udc80\uf9dd\udc9d \udcec\ub58e\udced\ub663)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserUpdateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "\udcec\uc524\uf9dd\udc9d \udcec\ub58e\udced\ub663 (JWT \udced\ub117\udced\uac99 \udcec\ubfbe\udcec\uc4ec \udceb\uc089\udceb\ub497 \udcec\uc440\udced\uc29a\udced\ube2f\uf9de\udc80 \udcec\ube21\udcec\uc4ec)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserUpdateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "\udced\ubd3d\u6fe1\uc497\ube18 \udcec\ub2d4\udcec\uc819 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserUpdateResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/register": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udced\uc276\udcec\uc35d\u5a9b\udc80\udcec\uc5ef",
+                "description": "\udcec\uc520\uf9ce\ubdbf\uc52a\u6028\udcbc \u936e\uafa8\udcb0\udc80\u8e30\ub34a\uc0c7\u745c\udcbc \udcec\uad97\udcec\uc29c\udced\ube33 \udced\uc276\udcec\uc35d\u5a9b\udc80\udcec\uc5ef",
+                "operationId": "register",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRegisterRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc440\udced\uc29a\udcec\uaf66 \u5bc3\udc80\uf9dd\udc9d \udcec\ub58e\udced\ub663)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRegisterResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "\udcec\uc520\u8a98\udcb8 \u8b70\ub301\uc631\udced\ube2f\udceb\ub497 \udcec\uc520\uf9ce\ubdbf\uc52a",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRegisterResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "\udced\uc276\udcec\uc35d\u5a9b\udc80\udcec\uc5ef \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserRegisterResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/logout": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\u6fe1\uc493\ub807\udcec\ube18\udcec\uc350",
+                "description": "JWT \udced\ub117\udced\uac99 \u8351\uc88f\uad8e\u745c\udcbc \udcec\uc823\u5ac4\uace0\ube2f\udcec\ubfec \u6fe1\uc493\ub807\udcec\ube18\udcec\uc350 \uf9e3\uc10e\u2501",
+                "operationId": "logout",
+                "responses": {
+                    "401": {
+                        "description": "\udcec\uc524\uf9dd\udc9d \udcec\ub58e\udced\ub663 (JWT \udced\ub117\udced\uac99 \udcec\ubfbe\udcec\uc4ec \udceb\uc089\udceb\ub497 \udcec\uc440\udced\uc29a\udced\ube2f\uf9de\udc80 \udcec\ube21\udcec\uc4ec)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLogoutResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "\u6fe1\uc493\ub807\udcec\ube18\udcec\uc350 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLogoutResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\u6fe1\uc493\ub807\udcec\uc524",
+                "description": "\udcec\uc520\uf9ce\ubdbf\uc52a\u6028\udcbc \u936e\uafa8\udcb0\udc80\u8e30\ub34a\uc0c7\u745c\udcbc \udcec\uad97\udcec\uc29c\udced\ube33 \u6fe1\uc493\ub807\udcec\uc524 (JWT \udced\ub117\udced\uac99\udcec\udc9d\udc80 \u8351\uc88f\uad8e\u6fe1\udc9c \udcec\uc7fe\udceb\ub596)",
+                "operationId": "login",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserLoginRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc440\udced\uc29a\udcec\uaf66 \u5bc3\udc80\uf9dd\udc9d \udcec\ub58e\udced\ub663)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "\u6fe1\uc493\ub807\udcec\uc524 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "\udcec\uc524\uf9dd\udc9d \udcec\ub58e\udced\ub663 (\udcec\uc520\uf9ce\ubdbf\uc52a \udceb\uc089\udceb\ub497 \u936e\uafa8\udcb0\udc80\u8e30\ub34a\uc0c7 \u907a\ub349\uc52a\u79fb\udc98)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLoginResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sightings": {
+            "post": {
+                "tags": [
+                    "Sighting"
+                ],
+                "summary": "Sighting \udcec\uae6e\udcec\uaf66",
+                "description": "\udcec\uc520\u8a98\uba84\udca7\udc80\u745c\udcbc \udcec\ubfbd\u6fe1\uc495\ubc76\udced\ube2f\u6028\udca0 \udceb\ub8de\u81fe\uc1f1\uc4e3 \udcec\uc524\udcec\ub587\udced\ube2f\udcec\ubfec Sighting\udcec\uc4e3 \udcec\uae6e\udcec\uaf66\udced\ube40\udceb\ub572\udceb\ub58e. Vision API \u5bc3\uaccc\ub0b5\udceb\ub497 \uf9dd\ub431\ub586 \u8adb\uc111\uc19a\udceb\ub9ba\uf9ce\udcb0, Species \udcec\uc819\u8e42\ub300\ub497 \u8adb\uae43\ub807\udceb\uc52a\udcec\uc2ab\udceb\ubc76\udcec\ubfc9\udcec\uaf4c \uf9e3\uc10e\u2501\udceb\ub9d7\udceb\ub572\udceb\ub58e.",
+                "operationId": "createSighting",
+                "parameters": [
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Sighting \udcec\uc823\uf9cf\udca9",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Sighting \udcec\uaf55\uf9cf\udc85",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "description": "\udcec\ubfbd\u6fe1\uc495\ubc76\udced\ube37 \udcec\uc520\u8a98\uba84\udca7\udc80 \udced\ub646\udcec\uc52a",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc520\u8a98\uba84\udca7\udc80 \udced\ub646\udcec\uc52a \udced\uc08e\udcec\ub587 \udcec\uc0a4\u745c\udc98 \udceb\ubc91)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SightingCreateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "\udcec\uc524\uf9dd\udc9d \udcec\ub58e\udced\ub663",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SightingCreateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "\udcec\uaf4c\u8e30\udc84 \udcec\uc0a4\u745c\udc98",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SightingCreateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Sighting \udcec\uae6e\udcec\uaf66 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SightingCreateResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/animal/recognition": {
+            "post": {
+                "tags": [
+                    "AI"
+                ],
+                "summary": "\udceb\ub8de\u81fe\udcbc \udcec\uc524\udcec\ub587 (GPT-4o Vision)",
+                "description": "\udcec\ubfbd\u6fe1\uc495\ubc76\udceb\ub9c2 \udcec\uc520\u8a98\uba84\udca7\udc80\udcec\ubfc9\udcec\uaf4c \udceb\ub8de\u81fe\uc1f1\uc4e3 \udcec\uc524\udcec\ub587\udced\ube2f\u6028\udca0 \udced\ube30\uf9cf\ub086\uc4e3 \udced\ub8f7\udced\ube3f\udced\ube33 \u91ab\ub085\uca9f\u745c\udcbc \u8adb\uc111\uc19a\udced\ube40\udceb\ub572\udceb\ub58e. GPT-4o Vision API \udcec\uad97\udcec\uc29c.",
+                "operationId": "recognizeAnimals",
+                "parameters": [
+                    {
+                        "name": "confidenceThreshold",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "maxResults",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "\udceb\ub8de\u81fe\udcbc \udcec\uc524\udcec\ub587 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalRecognitionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "OpenAI Vision API \udced\uc0c7\u7570\udc9c \udcec\ub58e\udced\ub663",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalRecognitionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc520\u8a98\uba84\udca7\udc80 \udced\ub646\udcec\uc52a \udcec\uc0a4\u745c\udc98)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalRecognitionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/animal/description": {
+            "post": {
+                "tags": [
+                    "AI"
+                ],
+                "summary": "\udceb\ub8de\u81fe\udcbc \udcec\uaf55\uf9cf\udc85 \u8b70\uace0\uc276",
+                "description": "\udceb\ub8de\u81fe\uc1f1\uc4fd \udced\ube30\uf9cf\ub086\uc4e3 \udcec\uc5ef\udceb\uc830\u8adb\uc3c6\ube18 \udced\ube50\udceb\ub5a6 \udceb\ub8de\u81fe\uc1f1\ubfc9 \udceb\udc8c\udc80\udced\ube33 \udcec\uae3d\udcec\uaf6d\udced\ube33 \udcec\uaf55\uf9cf\ub086\uc4e3 \u8adb\uc111\uc19a\udced\ube40\udceb\ub572\udceb\ub58e. DB\udcec\ubfc9 \uf9e6\uba2f\ub586\udceb\ub9c2 \udcec\uc819\u8e42\ub2ff\udcb0\udc80 \udcec\uc5f3\udcec\uc45d\uf9ce\udcb4 \u8adb\uc111\uc19a\udced\ube2f\u6028\udca0, \udcec\ubfbe\udcec\uc45d\uf9ce\udcb4 OpenAI API\u745c\udcbc \udced\uc0c7\u7570\uc497\ube2f\udcec\ubfec \udcec\uc819\u8e42\ub300\udca5\udcbc \udcec\udca0\udc80\udcec\uc623\udced\ube33 \udced\uc351 \u8adb\uc111\uc19a\udced\ube40\udceb\ub572\udceb\ub58e.",
+                "operationId": "getAnimalDescription",
+                "parameters": [
+                    {
+                        "name": "scientificName",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\udceb\ub8de\u81fe\udcbc \udcec\uaf55\uf9cf\udc85 \u8b70\uace0\uc276 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalDescriptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udced\ube30\uf9cf\udc85 \udced\uc08e\udcec\ub587 \udcec\uc0a4\u745c\udc98)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalDescriptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "OpenAI API \udced\uc0c7\u7570\udc9c \udcec\ub58e\udced\ub663",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AnimalDescriptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/media/{mediaId}/visibility": {
+            "patch": {
+                "tags": [
+                    "Media: Manage"
+                ],
+                "summary": "\u8a98\uba83\ubd52\udcec\ubf31\udcec\uc4fd sighting \u5a9b\udc80\udcec\ub586\udcec\uaf66 \u8e42\udc80\u5bc3\udcbd (public/private)",
+                "description": "\u8e42\uba84\uc524 \udceb\uc089\udceb\ub497 \u613f\udc80\u7531\u044a\uc604\uf9cd\udc8c \u5a9b\udc80\udceb\ub4ab. visibility\udceb\ub497 public \udced\uc0ca\udcec\udc9d\udc80 private(\udceb\udc8c\udc80\udcec\ub0fc\u81fe\uba84\uc604 \u81fe\ub301\ub586).",
+                "operationId": "updateVisibility",
+                "parameters": [
+                    {
+                        "name": "mediaId",
+                        "in": "path",
+                        "description": "\udceb\udc8c\udc80\udcec\uae3d Media\udcec\uc4fd UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateVisibilityRequest"
+                            },
+                            "examples": {
+                                "public": {
+                                    "description": "public",
+                                    "value": {
+                                        "visibility": "public"
+                                    }
+                                },
+                                "private": {
+                                    "description": "private",
+                                    "value": {
+                                        "visibility": "private"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateVisibilityResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health-check": {
+            "get": {
+                "tags": [
+                    "health-check-controller"
+                ],
+                "operationId": "healthCheck",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udcec\uad97\udcec\uc29c\udcec\uc604 \uf9cf\u2478\uc909 \u8b70\uace0\uc276",
+                "description": "\udceb\ubc91\u6fe1\uc578\ub9c2 \udcec\uad97\udcec\uc29c\udcec\uc604\udceb\ubc7e\udcec\uc4fd \u6028\ub4e6\ucefb \udcec\uc819\u8e42\udcb4 \uf9cf\u2478\uc909\udcec\uc4e3 \udced\ub7f9\udcec\uc520\uf9de\udc80\udceb\uaf55\udcec\uc520\udcec\ub021\udcec\uc45d\u6fe1\udc9c \u8b70\uace0\uc276. \u5bc3\udc80\udcec\uae4b\udcec\ubf31\u6fe1\udc9c email \udceb\uc089\udceb\ub497 displayName \u5bc3\udc80\udcec\uae4b \u5a9b\udc80\udceb\ub4ab (\udcec\uc524\uf9dd\udc9d \u907a\ub34a\ube18\udcec\uc282)",
+                "operationId": "getUserList",
+                "parameters": [
+                    {
+                        "name": "pageable",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Pageable"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udced\ub7f9\udcec\uc520\uf9de\udc80 \u8e30\ub34a\uc0c7 \udceb\uc089\udceb\ub497 \udced\uac95\u6e72\uaccc\udcb0\udc80 \udcec\uc440\udced\uc29a\udced\ube2f\uf9de\udc80 \udcec\ube21\udcec\uc4ec)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 \uf9cf\u2478\uc909 \u8b70\uace0\uc276 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserListResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{userId}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udced\ub4c5\udcec\uc819 \udcec\uad97\udcec\uc29c\udcec\uc604 \udced\ubd3d\u6fe1\uc497\ube18 \u8b70\uace0\uc276",
+                "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 ID\u6fe1\udc9c \udced\ube50\udceb\ub5a6 \udcec\uad97\udcec\uc29c\udcec\uc604\udcec\uc4fd \u6028\ub4e6\ucefb \udced\ubd3d\u6fe1\uc497\ube18 \udcec\uc819\u8e42\ub300\udca5\udcbc \u8b70\uace0\uc276 (\udcec\uc524\uf9dd\udc9d \u907a\ub34a\ube18\udcec\uc282)",
+                "operationId": "getUserProfile",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 \udced\ubd3d\u6fe1\uc497\ube18 \u8b70\uace0\uc276 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserPublicInfoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "\udcec\uad97\udcec\uc29c\udcec\uc604\u745c\udcbc \uf9e1\uc5a0\uc4e3 \udcec\ub2d4 \udcec\ubfbe\udcec\uc4ec",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserPublicInfoResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/exists": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "\udcec\uc520\uf9ce\ubdbf\uc52a \u8b70\ub301\uc631 \udced\uc197\udcec\uc524",
+                "description": "\udced\ube50\udceb\ub5a6 \udcec\uc520\uf9ce\ubdbf\uc52a\u6fe1\udc9c \u5a9b\udc80\udcec\uc5ef\udceb\ub9c2 \udcec\uad97\udcec\uc29c\udcec\uc604\u5a9b\udc80 \udcec\uc5f3\udceb\ub497\uf9de\udc80 \udced\uc197\udcec\uc524",
+                "operationId": "checkEmailExists",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\udcec\uc520\uf9ce\ubdbf\uc52a \u8b70\ub301\uc631 \udcec\ubfec\u907a\udc80 \udced\uc197\udcec\uc524 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEmailExistsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "\udcec\uc612\uf9cf\uc0b3\ub9c2 \udcec\uc282\uf9e3\udcad (\udcec\uc520\uf9ce\ubdbf\uc52a \udced\ub646\udceb\uc52a\u8a98\uba85\uaf63 \udceb\ub2bb\udceb\uc52b)",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEmailExistsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medias/my": {
+            "get": {
+                "tags": [
+                    "media-browse-controller"
+                ],
+                "operationId": "pageMyUploads",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Zero-based page index (0..N)",
+                        "required": false,
+                        "schema": {
+                            "minimum": 0,
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "The size of the page to be returned",
+                        "required": false,
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "createdAt,DESC"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageMediaBrowseItemDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medias/browse": {
+            "get": {
+                "tags": [
+                    "media-browse-controller"
+                ],
+                "operationId": "browse",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Zero-based page index (0..N)",
+                        "required": false,
+                        "schema": {
+                            "minimum": 0,
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "The size of the page to be returned",
+                        "required": false,
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "createdAt,DESC"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageMediaBrowseItemDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/ai/config": {
+            "get": {
+                "tags": [
+                    "AI"
+                ],
+                "summary": "AI \udcec\uaf55\udcec\uc819 \udcec\uc819\u8e42\udcb4 \u8b70\uace0\uc276",
+                "description": "\udced\uc07d\udcec\uc631 OpenAI API \udcec\uaf55\udcec\uc819 \udcec\uc819\u8e42\ub300\udca5\udcbc \u8b70\uace0\uc276\udced\ube40\udceb\ub572\udceb\ub58e. (\udcec\uc524\uf9dd\udc9d \udcec\uc819\u8e42\ub300\ub497 \uf9cd\ub349\ub4aa\udced\uada7\udceb\ub9d6)",
+                "operationId": "getConfig",
+                "responses": {
+                    "200": {
+                        "description": "\udcec\uaf55\udcec\uc819 \udcec\uc819\u8e42\udcb4 \u8b70\uace0\uc276 \udcec\uaf66\u6028\udcb5",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/media/{mediaId}": {
+            "delete": {
+                "tags": [
+                    "Media: Manage"
+                ],
+                "summary": "\u8a98\uba83\ubd52\udcec\ubf31 \udcec\uad98\udcec\uc823",
+                "description": "\u8e42\uba84\uc524 \udceb\uc089\udceb\ub497 \u613f\udc80\u7531\u044a\uc604\uf9cd\udc8c \u5a9b\udc80\udceb\ub4ab. \u7652\uc1f1\udca0\udc80 sighting\udcec\uc4e3 \udcec\uad98\udcec\uc823\udced\ube33 \udceb\ubb98 media\u745c\udcbc \udcec\uad98\udcec\uc823\udced\ube40\udceb\ub572\udceb\ub58e.",
+                "operationId": "deleteMedia",
+                "parameters": [
+                    {
+                        "name": "mediaId",
+                        "in": "path",
+                        "description": "\udcec\uad98\udcec\uc823\udced\ube37 Media\udcec\uc4fd UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeleteMediaResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "UserUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "displayName": {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string",
+                        "description": "\udced\ubab4\udcec\ub586 \udcec\uc520\u7531\udc84",
+                        "example": "\udced\uc189\u6e72\uba83\ub8de"
+                    },
+                    "avatarUrl": {
+                        "maxLength": 500,
+                        "minLength": 0,
+                        "type": "string",
+                        "description": "\udced\ubd3d\u6fe1\uc497\ube18 \udcec\uc520\u8a98\uba84\udca7\udc80 URL",
+                        "example": "https://example.com/avatar.jpg"
+                    }
+                },
+                "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 \udcec\uc819\u8e42\udcb4 \udcec\ub2d4\udcec\uc819 \udcec\uc282\uf9e3\udcad"
+            },
+            "UserUpdateResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 ID",
+                        "format": "uuid",
+                        "example": "550e8400-e29b-41d4-a716-446655440000"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "\udcec\uc520\uf9ce\ubdbf\uc52a",
+                        "example": "user@example.com"
+                    },
+                    "displayName": {
+                        "type": "string",
+                        "description": "\udced\ubab4\udcec\ub586 \udcec\uc520\u7531\udc84",
+                        "example": "\udced\uc189\u6e72\uba83\ub8de"
+                    },
+                    "avatarUrl": {
+                        "type": "string",
+                        "description": "\udced\ubd3d\u6fe1\uc497\ube18 \udcec\uc520\u8a98\uba84\udca7\udc80 URL",
+                        "example": "https://example.com/avatar.jpg"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "description": "\udcec\ub2d4\udcec\uc819 \udcec\uc52a\udcec\ub586",
+                        "format": "date-time"
+                    }
+                },
+                "description": "\udcec\uad97\udcec\uc29c\udcec\uc604 \udcec\uc819\u8e42\udcb4 \udcec\ub2d4\udcec\uc819 \udcec\uc4f3\udceb\ub59f"
+            },
+            "UserRegisterRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "maxLength": 2147483647,
+                        "minLength": 8,
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserRegisterResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "admin",
+                            "moderator"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "UserLogoutResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UserLoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserLoginResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "admin",
+                            "moderator"
+                        ]
+                    }
+                }
+            },
+            "AnimalDetection": {
+                "type": "object",
+                "properties": {
+                    "label": {
+                        "type": "string"
+                    },
+                    "confidence": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "scientificName": {
+                        "type": "string"
+                    },
+                    "boundingBox": {
+                        "$ref": "#/components/schemas/BoundingBox"
+                    }
+                }
+            },
+            "BoundingBox": {
+                "type": "object",
+                "properties": {
+                    "x1": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "y1": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "x2": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "y2": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "height": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "GpsLocation": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "MediaInfo": {
+                "type": "object",
+                "properties": {
+                    "mediaId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "originalUrl": {
+                        "type": "string"
+                    },
+                    "mimeType": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "height": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "bytes": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "extraInfo": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "SightingCreateResponse": {
+                "type": "object",
+                "properties": {
+                    "sightingId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "aiConfidence": {
+                        "type": "number"
+                    },
+                    "gpsLocation": {
+                        "$ref": "#/components/schemas/GpsLocation"
+                    },
+                    "occurredAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "media": {
+                        "$ref": "#/components/schemas/MediaInfo"
+                    },
+                    "detections": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AnimalDetection"
+                        }
+                    },
+                    "speciesProcessingStatus": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "COMPLETED",
+                            "NOT_DETECTED"
+                        ]
+                    }
+                }
+            },
+            "AnimalRecognitionResponse": {
+                "type": "object",
+                "properties": {
+                    "imageFileName": {
+                        "type": "string"
+                    },
+                    "detections": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AnimalDetection"
+                        }
+                    },
+                    "totalDetections": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "averageConfidence": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "AnimalDescriptionResponse": {
+                "type": "object",
+                "properties": {
+                    "speciesId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "scientificName": {
+                        "type": "string"
+                    },
+                    "commonNameKo": {
+                        "type": "string"
+                    },
+                    "commonNameEn": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "general",
+                            "endangered",
+                            "natural_monument"
+                        ]
+                    },
+                    "fromCache": {
+                        "type": "boolean"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "detailInfo": {
+                        "$ref": "#/components/schemas/OpenAiAnimalInfoDto"
+                    }
+                }
+            },
+            "OpenAiAnimalInfoDto": {
+                "type": "object",
+                "properties": {
+                    "\udced\ube33\u63f4\udcad\uf9cf\udc85": {
+                        "type": "string"
+                    },
+                    "\udcec\uc07a\u81fe\uba83\ucc78": {
+                        "type": "string"
+                    },
+                    "\u907a\uafa8\uca9f\udced\ube30\udcec\uc7fb \udcec\uc819\u8e42\udcb4": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    },
+                    "\udcec\ub58a\uf9e3\ub301\uc7fb \udced\ub4c5\uf9de\udc95": {
+                        "type": "string"
+                    },
+                    "\udcec\uaf4c\udcec\ub587\uf9de\udc80 \u8adb\udc8f \u907a\uafaa\ub8f7 \uf9de\udc80\udcec\ubfed": {
+                        "type": "string"
+                    },
+                    "\udcec\uae6e\udced\uc1a2 \udcec\ub4bf\udcec\uaf66": {
+                        "type": "string"
+                    },
+                    "\u8e42\ub301\u3008 \udcec\uae3d\udced\uae6d": {
+                        "type": "string"
+                    },
+                    "\udcec\uae6e\udced\uae6d\u6028\uafa9\ubfc9\udcec\uaf4c\udcec\uc4fd \udcec\ubfed\udced\ube37": {
+                        "type": "string"
+                    },
+                    "\udcec\uc524\u5a9b\uafa7\ub0b5\udcec\uc4fd \u613f\udc80\u6028\udc84": {
+                        "type": "string"
+                    },
+                    "\udced\uc50e\u8a98\uba83\uc908\udcec\uc2ab \udcec\uad97\udcec\ub58e": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateVisibilityRequest": {
+                "type": "object",
+                "properties": {
+                    "visibility": {
+                        "type": "string",
+                        "description": "\uf9cf\u247a\ubab4 \u5a9b\udc80\udcec\ub586\udcec\uaf66: public \udceb\uc089\udceb\ub497 private (\udceb\udc8c\udc80\udcec\ub0fc\u81fe\uba84\uc604 \u81fe\ub301\ub586)",
+                        "example": "public"
+                    }
+                },
+                "description": "sighting \u5a9b\udc80\udcec\ub586\udcec\uaf66 \u8e42\udc80\u5bc3\udcbd \udcec\uc282\uf9e3\udcad"
+            },
+            "UpdateVisibilityResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "updatedSightings": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "visibility": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "description": "sighting \u5a9b\udc80\udcec\ub586\udcec\uaf66 \u8e42\udc80\u5bc3\udcbd \udcec\uc4f3\udceb\ub59f"
+            },
+            "Pageable": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "minimum": 0,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "size": {
+                        "minimum": 1,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "sort": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UserListResponse": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserPublicInfoResponse"
+                        }
+                    },
+                    "currentPage": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "hasNext": {
+                        "type": "boolean"
+                    },
+                    "hasPrevious": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "UserPublicInfoResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "admin",
+                            "moderator"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "UserProfileResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "admin",
+                            "moderator"
+                        ]
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "lastLoginAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "UserEmailExistsResponse": {
+                "type": "object",
+                "properties": {
+                    "exists": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "MediaBrowseItemDto": {
+                "type": "object",
+                "properties": {
+                    "mediaId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "storagePath": {
+                        "type": "string"
+                    },
+                    "mimeType": {
+                        "type": "string"
+                    },
+                    "width": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "height": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ownerId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "sightingId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "sightingVisibility": {
+                        "type": "string",
+                        "enum": [
+                            "public",
+                            "private"
+                        ]
+                    }
+                }
+            },
+            "PageMediaBrowseItemDto": {
+                "type": "object",
+                "properties": {
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageable": {
+                        "$ref": "#/components/schemas/PageableObject"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MediaBrowseItemDto"
+                        }
+                    },
+                    "number": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "sort": {
+                        "$ref": "#/components/schemas/SortObject"
+                    },
+                    "first": {
+                        "type": "boolean"
+                    },
+                    "last": {
+                        "type": "boolean"
+                    },
+                    "numberOfElements": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "empty": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PageableObject": {
+                "type": "object",
+                "properties": {
+                    "paged": {
+                        "type": "boolean"
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "sort": {
+                        "$ref": "#/components/schemas/SortObject"
+                    },
+                    "unpaged": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "SortObject": {
+                "type": "object",
+                "properties": {
+                    "sorted": {
+                        "type": "boolean"
+                    },
+                    "empty": {
+                        "type": "boolean"
+                    },
+                    "unsorted": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "DeleteMediaResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "deletedSightings": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "deletedMedia": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
