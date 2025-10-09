@@ -16,6 +16,7 @@ import {
 } from '~/common/components/ui/select';
 import { Loader2, ArrowLeft, Save } from 'lucide-react';
 import { useAuth } from '~/lib/hooks/use-auth';
+import { utcToKstDate, kstToUtcDate } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 정보 수정 | 셔터 히어로즈' }];
@@ -53,20 +54,21 @@ export default function SightingEditPage() {
         setDescription(data.description || '');
         setVisibility(data.visibility as 'public' | 'private');
 
-        // occurredAt을 datetime-local 형식으로 변환
+        // occurredAt을 datetime-local 형식으로 변환 (UTC -> KST)
         if (data.occurredAt) {
-          const date = new Date(data.occurredAt);
-          const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
-          setOccurredAt(localDateTime);
+          const kstDate = utcToKstDate(data.occurredAt);
+          if (kstDate) {
+            const localDateTime = kstDate.toISOString().slice(0, 16);
+            setOccurredAt(localDateTime);
+          }
         } else {
-          // occurredAt이 없으면 현재 시간으로 설정
+          // occurredAt이 없으면 현재 시간으로 설정 (KST)
           const now = new Date();
-          const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
-          setOccurredAt(localDateTime);
+          const kstNow = utcToKstDate(now);
+          if (kstNow) {
+            const localDateTime = kstNow.toISOString().slice(0, 16);
+            setOccurredAt(localDateTime);
+          }
         }
 
         // 권한 체크
@@ -92,11 +94,20 @@ export default function SightingEditPage() {
     setError(null);
 
     try {
+      // occurredAt을 KST에서 UTC로 변환하여 전송
+      let occurredAtUtc: string | undefined = undefined;
+      if (occurredAt) {
+        const utcDate = kstToUtcDate(occurredAt);
+        if (utcDate) {
+          occurredAtUtc = utcDate.toISOString();
+        }
+      }
+
       await sightingsApi.update(sightingId, {
         title: title || undefined,
         description: description || undefined,
         visibility,
-        occurredAt: occurredAt ? new Date(occurredAt).toISOString() : undefined,
+        occurredAt: occurredAtUtc,
       });
 
       navigate(`/sightings/${sightingId}`);

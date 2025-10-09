@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { parseWKTPoint } from '~/lib/utils/geo.utils';
 import { useAuth } from '~/lib/hooks/use-auth';
+import { formatToKstDateTime, formatToKstLongDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 정보 상세 | 셔터 히어로즈' }];
@@ -165,7 +166,7 @@ export default function SightingDetailPage() {
           <h1 className="text-3xl font-bold mb-2">{sighting.title}</h1>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>{new Date(sighting.createdAt).toLocaleString('ko-KR')}</span>
+            <span>{formatToKstDateTime(sighting.createdAt)}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -366,14 +367,7 @@ export default function SightingDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-medium">
-              {new Date(sighting.occurredAt).toLocaleString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'short',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {formatToKstLongDateTime(sighting.occurredAt)}
             </p>
           </CardContent>
         </Card>
@@ -425,25 +419,13 @@ export default function SightingDetailPage() {
             <div>
               <span className="text-sm text-gray-600">등록일</span>
               <p className="text-sm font-medium">
-                {new Date(sighting.createdAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(sighting.createdAt)}
               </p>
             </div>
             <div>
               <span className="text-sm text-gray-600">최종 수정</span>
               <p className="text-sm font-medium">
-                {new Date(sighting.updatedAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(sighting.updatedAt)}
               </p>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { Button } from '~/common/components/ui/button';
 import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
 import { sightingsApi } from '~/lib/api/sightings.api';
+import { formatToKstDate, formatToKstDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '내 프로필 | 셔터 히어로즈' }];
@@ -82,11 +83,7 @@ export default function MyProfilePage() {
           <div>
             <p className="text-sm text-gray-500">가입일</p>
             <p className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatToKstDate(user.createdAt)}
             </p>
           </div>
 
@@ -94,13 +91,7 @@ export default function MyProfilePage() {
             <div>
               <p className="text-sm text-gray-500">마지막 로그인</p>
               <p className="font-medium">
-                {new Date(user.lastLoginAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(user.lastLoginAt)}
               </p>
             </div>
           )}

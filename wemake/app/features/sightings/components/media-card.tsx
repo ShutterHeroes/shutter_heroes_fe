@@ -4,6 +4,7 @@ import { Card, CardContent } from '~/common/components/ui/card';
 import { Badge } from '~/common/components/ui/badge';
 import type { Media } from '~/lib/types/media.types';
 import { CalendarIcon, EyeIcon, EyeOffIcon, ImageOffIcon } from 'lucide-react';
+import { formatToKstDate } from '~/lib/utils/date.utils';
 
 interface MediaCardProps {
   media: Media;
@@ -13,11 +14,7 @@ export function MediaCard({ media }: MediaCardProps) {
   const [imageError, setImageError] = useState(false);
   // storagePath에 이미 S3 URL이 포함되어 있음
   const imageUrl = media.storagePath;
-  const createdDate = new Date(media.createdAt).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const createdDate = formatToKstDate(media.createdAt);
 
   return (
     <Link to={`/sightings/${media.sightingId}`}>

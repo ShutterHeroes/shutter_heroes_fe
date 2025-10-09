@@ -15,6 +15,7 @@ import { SearchIcon, Loader2Icon, XIcon, MapIcon, ImageOff, Navigation, Circle }
 import type { SightingListItem } from '~/lib/types/sighting.types';
 import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
 import { sightingsApi } from '~/lib/api/sightings.api';
+import { formatToKstDate, formatToKstDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '목격 지도 | 셔터 히어로즈' }];
@@ -405,13 +406,7 @@ export default function MapPage() {
                   <div>
                     <span className="text-xs text-gray-500">목격 일시</span>
                     <p className="font-medium text-gray-800">
-                      {new Date(selectedSighting.occurredAt).toLocaleString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatToKstDateTime(selectedSighting.occurredAt)}
                     </p>
                   </div>
                 )}
@@ -420,11 +415,7 @@ export default function MapPage() {
                 <div>
                   <span className="text-xs text-gray-500">등록일</span>
                   <p className="text-sm text-gray-700">
-                    {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                    {formatToKstDate(selectedSighting.createdAt)}
                   </p>
                 </div>
 
@@ -433,11 +424,7 @@ export default function MapPage() {
                   <div>
                     <span className="text-xs text-gray-500">최종 수정</span>
                     <p className="text-sm text-gray-700">
-                      {new Date(selectedSighting.updatedAt).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {formatToKstDate(selectedSighting.updatedAt)}
                     </p>
                   </div>
                 )}

@@ -3,6 +3,7 @@ import { useUserProfile } from '../hooks/use-user-profile';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
 import { Avatar } from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
+import { formatToKstDate } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '사용자 프로필 | 셔터 히어로즈' }];
@@ -56,11 +57,7 @@ export default function UserProfilePage() {
           <div>
             <p className="text-sm text-gray-500">가입일</p>
             <p className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatToKstDate(user.createdAt)}
             </p>
           </div>
 

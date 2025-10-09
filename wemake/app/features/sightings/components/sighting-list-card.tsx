@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Card, CardContent } from '~/common/components/ui/card';
 import { Badge } from '~/common/components/ui/badge';
 import type { SightingListItem } from '~/lib/types/sighting.types';
+import { formatToKstDate } from '~/lib/utils/date.utils';
 import {
   CalendarIcon,
   EyeIcon,
@@ -21,11 +22,7 @@ interface SightingListCardProps {
 export function SightingListCard({ sighting }: SightingListCardProps) {
   const [imageError, setImageError] = useState(false);
   const imageUrl = sighting.sanitizedUrl || sighting.storagePath;
-  const createdDate = new Date(sighting.createdAt).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const createdDate = formatToKstDate(sighting.createdAt);
 
   return (
     <Link to={`/sightings/${sighting.id}`}>
