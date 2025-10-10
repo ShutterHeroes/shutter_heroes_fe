@@ -106,27 +106,6 @@ export function formatToKstDateTime(
   // UTC를 KST로 변환 (UTC + 9시간)
   const kstDate = convertUtcToKst(utcDate);
 
-  // 디버깅: 변환 과정 로그
-  if (typeof utcDateString === 'string') {
-    console.log('[date.utils] ========== 시간 변환 디버깅 ==========');
-    console.log('[date.utils] 1. Input (서버에서 받은 UTC):', utcDateString);
-    console.log('[date.utils] 2. UTC Date 객체:', utcDate.toISOString());
-    console.log('[date.utils] 3. UTC timestamp:', utcDate.getTime());
-    console.log('[date.utils] 4. KST Date 객체 (UTC+9h):', kstDate.toISOString());
-    console.log('[date.utils] 5. KST timestamp:', kstDate.getTime());
-
-    const formatted = kstDate.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC',
-    });
-    console.log('[date.utils] 6. 최종 출력 (KST):', formatted);
-    console.log('[date.utils] =====================================');
-  }
-
   // 기본 옵션: 년, 월, 일, 시, 분 표시
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
