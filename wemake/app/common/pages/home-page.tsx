@@ -44,7 +44,7 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
               야생동물 목격,
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <span className="text-3xl md:text-5xl bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                 AI가 함께합니다
               </span>
             </h1>
