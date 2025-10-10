@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent } from '~/common/components/ui/card';
 import { Badge } from '~/common/components/ui/badge';
@@ -13,6 +13,7 @@ import {
   AlertTriangleIcon,
   UserIcon,
   ImageOff,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface SightingListCardProps {
@@ -21,12 +22,19 @@ interface SightingListCardProps {
 
 export function SightingListCard({ sighting }: SightingListCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [isVisited, setIsVisited] = useState(false);
   const imageUrl = sighting.sanitizedUrl || sighting.storagePath;
   const createdDate = formatToKstDate(sighting.createdAt);
 
+  useEffect(() => {
+    // 방문 여부 확인
+    const visitedSightings = JSON.parse(localStorage.getItem('visited-sightings') || '[]');
+    setIsVisited(visitedSightings.includes(String(sighting.id)));
+  }, [sighting.id]);
+
   return (
     <Link to={`/sightings/${sighting.id}`}>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+      <Card className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group ${isVisited ? 'opacity-75' : ''}`}>
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           {imageError || !imageUrl ? (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 text-gray-400">
@@ -34,17 +42,29 @@ export function SightingListCard({ sighting }: SightingListCardProps) {
               <span className="text-sm">이미지 없음</span>
             </div>
           ) : (
-            <img
-              src={imageUrl}
-              alt={sighting.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-              onError={() => setImageError(true)}
-            />
+            <>
+              <img
+                src={imageUrl}
+                alt={sighting.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+              {isVisited && (
+                <div className="absolute inset-0 bg-gray-900 bg-opacity-20" />
+              )}
+            </>
           )}
 
           {/* 상단 우측 배지들 */}
           <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+            {/* 방문 여부 */}
+            {isVisited && (
+              <Badge variant="secondary" className="bg-gray-700 text-white">
+                <CheckCircle2 className="w-3 h-3 mr-1" /> 확인함
+              </Badge>
+            )}
+
             {/* 공개 여부 */}
             <Badge variant={sighting.visibility === 'public' ? 'default' : 'secondary'}>
               {sighting.visibility === 'public' ? (

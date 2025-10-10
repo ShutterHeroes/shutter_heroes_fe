@@ -61,6 +61,13 @@ export default function SightingDetailPage() {
       try {
         const data = await sightingsApi.getById(sightingId);
         setSighting(data);
+
+        // 방문 기록 저장
+        const visitedSightings = JSON.parse(localStorage.getItem('visited-sightings') || '[]');
+        if (!visitedSightings.includes(sightingId)) {
+          visitedSightings.push(sightingId);
+          localStorage.setItem('visited-sightings', JSON.stringify(visitedSightings));
+        }
       } catch (err: any) {
         console.error('Sighting 조회 에러:', err);
         setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
