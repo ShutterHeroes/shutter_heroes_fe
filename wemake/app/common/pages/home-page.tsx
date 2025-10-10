@@ -23,7 +23,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchRecentSightings = async () => {
       try {
-        const response = await sightingsApi.getAll({ page: 0, size: 8 });
+        const response = await sightingsApi.getAll({ page: 0, size: 20 });
         setRecentSightings(response.content);
       } catch (err) {
         console.error('최근 목격 정보 조회 에러:', err);
@@ -145,16 +145,26 @@ export default function HomePage() {
 
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(20)].map((_, i) => (
                 <div key={i} className="aspect-square bg-gray-200 animate-pulse rounded-lg" />
               ))}
             </div>
           ) : recentSightings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {recentSightings.map((sighting) => (
-                <SightingListCard key={sighting.id} sighting={sighting} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {recentSightings.map((sighting) => (
+                  <SightingListCard key={sighting.id} sighting={sighting} />
+                ))}
+              </div>
+              <div className="flex justify-center mt-8">
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/sightings">
+                    더보기
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </>
           ) : (
             <Card>
               <CardContent className="p-8 text-center text-gray-500">
