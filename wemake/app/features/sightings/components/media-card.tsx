@@ -28,7 +28,7 @@ export function MediaCard({ media }: MediaCardProps) {
           ) : (
             <img
               src={imageUrl}
-              alt="동물 목격"
+              alt="동물 관찰"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               onError={() => setImageError(true)}
             />

@@ -8,7 +8,7 @@ import { SightingListCard } from '~/features/sightings/components/sighting-list-
 import { Loader2 } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '내 목격 정보 | 셔터 히어로즈' }];
+  return [{ title: '내 관찰 정보 | 셔터 히어로즈' }];
 };
 
 export default function MySightingsPage() {
@@ -42,8 +42,8 @@ export default function MySightingsPage() {
       setHasMore(!response.last);
       setCurrentPage(page);
     } catch (err: any) {
-      console.error('내 목격 정보 조회 실패:', err);
-      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+      console.error('내 출동 기록 조회 실패:', err);
+      setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +114,7 @@ export default function MySightingsPage() {
   return (
     <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">내 목격 정보</h1>
+        <h1 className="text-3xl font-bold">내 출동 기록</h1>
       </div>
 
       {sightings.length > 0 ? (
@@ -138,15 +138,15 @@ export default function MySightingsPage() {
 
           {!hasMore && sightings.length > 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500">모든 목격 정보를 불러왔습니다.</p>
+              <p className="text-gray-500">모든 출동 기록을 불러왔습니다.</p>
             </div>
           )}
         </>
       ) : !isLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">아직 등록한 목격 정보가 없습니다.</p>
+          <p className="text-gray-500">아직 등록한 출동 기록이 없습니다.</p>
           <Button asChild className="mt-4">
-            <Link to="/sightings/submit">목격 정보 등록하기</Link>
+            <Link to="/sightings/submit">출동 기록 등록하기</Link>
           </Button>
         </div>
       ) : null}

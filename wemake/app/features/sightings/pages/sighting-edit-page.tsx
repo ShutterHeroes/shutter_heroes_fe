@@ -19,7 +19,7 @@ import { useAuth } from '~/lib/hooks/use-auth';
 import { utcToKstDate, kstToUtcDate } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 정보 수정 | 셔터 히어로즈' }];
+  return [{ title: '출동 기록 수정 | 셔터 히어로즈' }];
 };
 
 export default function SightingEditPage() {
@@ -77,7 +77,7 @@ export default function SightingEditPage() {
         }
       } catch (err: any) {
         console.error('Sighting 조회 에러:', err);
-        setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+        setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -113,7 +113,7 @@ export default function SightingEditPage() {
       navigate(`/sightings/${sightingId}`);
     } catch (err: any) {
       console.error('Sighting 수정 에러:', err);
-      setError(err.response?.data?.message || '목격 정보 수정에 실패했습니다.');
+      setError(err.response?.data?.message || '출동 기록 수정에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -134,7 +134,7 @@ export default function SightingEditPage() {
       <div className="container mx-auto max-w-2xl px-4 md:px-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || '목격 정보를 찾을 수 없습니다.'}</p>
+            <p className="text-red-600 mb-4">{error || '출동 기록을 찾을 수 없습니다.'}</p>
             <Button onClick={() => navigate(`/sightings/${sightingId}`)}>
               상세 페이지로 돌아가기
             </Button>
@@ -154,8 +154,8 @@ export default function SightingEditPage() {
 
       {/* 제목 */}
       <div>
-        <h1 className="text-3xl font-bold">목격 정보 수정</h1>
-        <p className="text-gray-500 mt-2">목격 정보의 내용을 수정할 수 있습니다.</p>
+        <h1 className="text-3xl font-bold">출동 기록 수정</h1>
+        <p className="text-gray-500 mt-2">출동 기록의 내용을 수정할 수 있습니다.</p>
       </div>
 
       {/* 수정 폼 */}
@@ -171,7 +171,7 @@ export default function SightingEditPage() {
               <Input
                 id="title"
                 type="text"
-                placeholder="목격 정보의 제목을 입력하세요"
+                placeholder="출동 기록의 제목을 입력하세요"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={255}
@@ -183,7 +183,7 @@ export default function SightingEditPage() {
               <Label htmlFor="description">설명</Label>
               <Textarea
                 id="description"
-                placeholder="목격 정보에 대한 상세한 설명을 입력하세요"
+                placeholder="출동 기록에 대한 상세한 설명을 입력하세요"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={6}
@@ -208,9 +208,9 @@ export default function SightingEditPage() {
               </Select>
             </div>
 
-            {/* 목격 일시 */}
+            {/* 관찰 일시 */}
             <div className="space-y-2">
-              <Label htmlFor="occurredAt">목격 일시</Label>
+              <Label htmlFor="occurredAt">관찰 일시</Label>
               <Input
                 id="occurredAt"
                 type="datetime-local"

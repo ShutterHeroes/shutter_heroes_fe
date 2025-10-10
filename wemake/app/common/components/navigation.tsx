@@ -44,7 +44,7 @@ import { useAuth } from "~/lib/hooks/use-auth";
 
 const menus = [
   {
-    name: "목격 정보",
+    name: "출동 기록",
     to: "/sightings",
   },
   {
@@ -172,7 +172,7 @@ export default function Navigation({
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/my/sightings">
                       <BarChart3Icon className="size-4 mr-2" />
-                      내 목격 정보
+                      내 출동 기록
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -286,7 +286,7 @@ export default function Navigation({
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <BarChart3Icon className="size-5" />
-                    <span>내 목격 정보</span>
+                    <span>내 출동 기록</span>
                   </Link>
                   <Link
                     to="/my/profile"

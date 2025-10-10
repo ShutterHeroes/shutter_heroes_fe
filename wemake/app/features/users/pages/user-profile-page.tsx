@@ -61,9 +61,9 @@ export default function UserProfilePage() {
             </p>
           </div>
 
-          {/* TODO: Phase 3에서 사용자의 목격 정보 목록 추가 */}
+          {/* TODO: Phase 3에서 사용자의 관찰 정보 목록 추가 */}
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">이 사용자의 목격 정보는 곧 추가될 예정입니다.</p>
+            <p className="text-sm text-gray-500">이 사용자의 출동 기록은 곧 추가될 예정입니다.</p>
           </div>
         </CardContent>
       </Card>

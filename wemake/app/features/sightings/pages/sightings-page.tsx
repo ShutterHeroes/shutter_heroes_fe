@@ -8,7 +8,7 @@ import { sightingsApi } from '~/lib/api/sightings.api';
 import type { SightingListItem } from '~/lib/types/sighting.types';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '동물 목격 정보 | 셔터 히어로즈' }];
+  return [{ title: '동물 관찰 정보 | 셔터 히어로즈' }];
 };
 
 export default function SightingsPage() {
@@ -48,8 +48,8 @@ export default function SightingsPage() {
       setCurrentPage(page);
       setTotalElements(response.totalElements);
     } catch (err: any) {
-      console.error('목격 정보 조회 실패:', err);
-      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+      console.error('출동 기록 조회 실패:', err);
+      setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +178,7 @@ export default function SightingsPage() {
     <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       {/* 헤더 및 검색 */}
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold">동물 목격 정보</h1>
+        <h1 className="text-3xl font-bold">출동 기록</h1>
 
         {/* 검색 바 */}
         <div className="flex gap-2">
@@ -241,14 +241,14 @@ export default function SightingsPage() {
 
           {!hasMore && sightings.length > 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500">모든 목격 정보를 불러왔습니다.</p>
+              <p className="text-gray-500">모든 출동 기록을 불러왔습니다.</p>
             </div>
           )}
         </>
       ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
-            {keyword ? '검색 결과가 없습니다.' : '등록된 목격 정보가 없습니다.'}
+            {keyword ? '검색 결과가 없습니다.' : '등록된 출동 기록이 없습니다.'}
           </p>
           {keyword && (
             <Button variant="outline" onClick={handleClearSearch} className="mt-4">

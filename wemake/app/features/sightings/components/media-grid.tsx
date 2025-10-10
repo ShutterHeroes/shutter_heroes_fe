@@ -9,7 +9,7 @@ export function MediaGrid({ medias }: MediaGridProps) {
   if (medias.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">아직 등록된 목격 정보가 없습니다.</p>
+        <p className="text-gray-500">아직 등록된 출동 기록이 없습니다.</p>
       </div>
     );
   }

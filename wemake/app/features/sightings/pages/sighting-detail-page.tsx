@@ -36,7 +36,7 @@ import { useAuth } from '~/lib/hooks/use-auth';
 import { formatToKstDateTime, formatToKstLongDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 정보 상세 | 셔터 히어로즈' }];
+  return [{ title: '관찰 정보 상세 | 셔터 히어로즈' }];
 };
 
 export default function SightingDetailPage() {
@@ -70,7 +70,7 @@ export default function SightingDetailPage() {
         }
       } catch (err: any) {
         console.error('Sighting 조회 에러:', err);
-        setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+        setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -88,7 +88,7 @@ export default function SightingDetailPage() {
       navigate('/my/sightings');
     } catch (err: any) {
       console.error('Sighting 삭제 에러:', err);
-      setError(err.response?.data?.message || '목격 정보 삭제에 실패했습니다.');
+      setError(err.response?.data?.message || '출동 기록 삭제에 실패했습니다.');
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);
@@ -112,7 +112,7 @@ export default function SightingDetailPage() {
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || '목격 정보를 찾을 수 없습니다.'}</p>
+            <p className="text-red-600 mb-4">{error || '출동 기록을 찾을 수 없습니다.'}</p>
             <Button onClick={() => navigate('/sightings')}>목록으로 돌아가기</Button>
           </CardContent>
         </Card>
@@ -129,9 +129,9 @@ export default function SightingDetailPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>목격 정보 삭제</DialogTitle>
+            <DialogTitle>출동 기록 삭제</DialogTitle>
             <DialogDescription>
-              정말로 이 목격 정보를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+              정말로 이 출동 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -363,13 +363,13 @@ export default function SightingDetailPage() {
         </Card>
       )}
 
-      {/* 목격 일시 */}
+      {/* 관찰 일시 */}
       {sighting.occurredAt && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-green-600" />
-              목격 일시
+              관찰 일시
             </CardTitle>
           </CardHeader>
           <CardContent>

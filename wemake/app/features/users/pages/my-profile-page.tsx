@@ -25,7 +25,7 @@ export default function MyProfilePage() {
         const response = await sightingsApi.getMySightings({ page: 0, size: 1 });
         setSightingsCount(response.totalElements);
       } catch (error) {
-        console.error('목격 정보 개수 조회 실패:', error);
+        console.error('출동 기록 개수 조회 실패:', error);
       }
     };
 
@@ -97,7 +97,7 @@ export default function MyProfilePage() {
           )}
 
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">내 목격 정보</p>
+            <p className="text-sm text-gray-500">내 출동 기록</p>
             <div className="flex items-center justify-between mt-2">
               <p className="text-2xl font-bold">
                 {sightingsCount !== null ? `${sightingsCount}건` : '로딩 중...'}
