@@ -78,8 +78,9 @@ export default function Navigation({
   return (
     <nav className="flex px-4 md:px-8 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50 border-b">
       <div className="flex items-center gap-2 md:gap-4">
-        <Link to="/" className="font-bold tracking-tighter text-base md:text-lg">
-          셔터 히어로즈
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/logo_3.png" alt="셔터 히어로즈 로고" className="h-8 w-auto" />
+          <span className="font-bold tracking-tighter text-base md:text-lg">셔터 히어로즈</span>
         </Link>
         
         {/* Desktop Navigation */}
