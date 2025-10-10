@@ -55,11 +55,36 @@ export default function SightingsPage() {
     }
   }, [isLoading]);
 
+  // 초기 데이터 로드 및 상태 복원
+  useEffect(() => {
+    const savedState = sessionStorage.getItem('sightings-page-state');
+
+    if (savedState) {
+      try {
+        const { sightings: savedSightings, currentPage: savedPage, keyword: savedKeyword, searchInput: savedSearchInput } = JSON.parse(savedState);
+
+        // 저장된 상태 복원
+        setSightings(savedSightings);
+        setCurrentPage(savedPage);
+        setKeyword(savedKeyword || '');
+        setSearchInput(savedSearchInput || '');
+        setHasMore(true); // 무한 스크롤은 계속 가능하도록
+
+        sessionStorage.removeItem('sightings-page-state');
+      } catch (err) {
+        console.error('상태 복원 실패:', err);
+        loadSightings(0, keyword || undefined);
+      }
+    } else {
+      loadSightings(0, keyword || undefined);
+    }
+  }, []);
+
   // 스크롤 위치 복원
   useEffect(() => {
     const savedScrollPosition = sessionStorage.getItem('sightings-scroll-position');
 
-    if (savedScrollPosition && !scrollPositionSaved.current) {
+    if (savedScrollPosition && !scrollPositionSaved.current && sightings.length > 0) {
       // 스크롤 위치 복원은 데이터 로딩 후에 수행
       const restoreScroll = () => {
         window.scrollTo(0, parseInt(savedScrollPosition, 10));
@@ -73,16 +98,18 @@ export default function SightingsPage() {
     }
   }, [sightings]);
 
-  // 컴포넌트 언마운트 시 스크롤 위치 저장
+  // 컴포넌트 언마운트 시 스크롤 위치 및 상태 저장
   useEffect(() => {
     return () => {
       sessionStorage.setItem('sightings-scroll-position', window.scrollY.toString());
+      sessionStorage.setItem('sightings-page-state', JSON.stringify({
+        sightings,
+        currentPage,
+        keyword,
+        searchInput,
+      }));
     };
-  }, []);
-
-  useEffect(() => {
-    loadSightings(0, keyword || undefined);
-  }, []);
+  }, [sightings, currentPage, keyword, searchInput]);
 
   useEffect(() => {
     if (!hasMore || isLoading) return;
