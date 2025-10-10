@@ -34,7 +34,7 @@ export function SightingListCard({ sighting }: SightingListCardProps) {
 
   return (
     <Link to={`/sightings/${sighting.id}`}>
-      <Card className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group ${isVisited ? 'opacity-75' : ''}`}>
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           {imageError || !imageUrl ? (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 text-gray-400">
@@ -42,18 +42,13 @@ export function SightingListCard({ sighting }: SightingListCardProps) {
               <span className="text-sm">이미지 없음</span>
             </div>
           ) : (
-            <>
-              <img
-                src={imageUrl}
-                alt={sighting.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-                onError={() => setImageError(true)}
-              />
-              {isVisited && (
-                <div className="absolute inset-0 bg-gray-900 bg-opacity-20" />
-              )}
-            </>
+            <img
+              src={imageUrl}
+              alt={sighting.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              onError={() => setImageError(true)}
+            />
           )}
 
           {/* 상단 우측 배지들 */}
