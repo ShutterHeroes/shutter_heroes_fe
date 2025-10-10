@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { type MetaFunction } from 'react-router';
+import { type MetaFunction, useLocation } from 'react-router';
 import { SightingListCard } from '../components/sighting-list-card';
 import { Button } from '~/common/components/ui/button';
 import { Input } from '~/common/components/ui/input';
@@ -12,6 +12,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function SightingsPage() {
+  const location = useLocation();
   const [sightings, setSightings] = useState<SightingListItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -22,6 +23,7 @@ export default function SightingsPage() {
   const [totalElements, setTotalElements] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const scrollPositionSaved = useRef(false);
 
   const loadSightings = useCallback(async (page: number, searchKeyword?: string) => {
     if (isLoading) return;
@@ -52,6 +54,31 @@ export default function SightingsPage() {
       setIsLoading(false);
     }
   }, [isLoading]);
+
+  // 스크롤 위치 복원
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem('sightings-scroll-position');
+
+    if (savedScrollPosition && !scrollPositionSaved.current) {
+      // 스크롤 위치 복원은 데이터 로딩 후에 수행
+      const restoreScroll = () => {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        scrollPositionSaved.current = true;
+        sessionStorage.removeItem('sightings-scroll-position');
+      };
+
+      // 데이터가 로드될 때까지 약간 지연
+      const timer = setTimeout(restoreScroll, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [sightings]);
+
+  // 컴포넌트 언마운트 시 스크롤 위치 저장
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem('sightings-scroll-position', window.scrollY.toString());
+    };
+  }, []);
 
   useEffect(() => {
     loadSightings(0, keyword || undefined);
