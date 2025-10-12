@@ -72,7 +72,6 @@ function AppContent() {
         <Navigation
           isLoggedIn={isAuthenticated}
           hasNotifications={false}
-          hasMessages={false}
         />
       )}
       <Outlet />

@@ -32,7 +32,6 @@ import {
   BarChart3Icon,
   BellIcon,
   LogOutIcon,
-  MessageCircleIcon,
   SettingsIcon,
   UserIcon,
   MenuIcon,
@@ -60,11 +59,9 @@ const menus = [
 export default function Navigation({
   isLoggedIn,
   hasNotifications,
-  hasMessages,
 }: {
   isLoggedIn: boolean;
   hasNotifications: boolean;
-  hasMessages: boolean;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -144,16 +141,6 @@ export default function Navigation({
             <Link to="/sightings/submit">등록하기</Link>
           </Button>
 
-          {/* Messages - Hidden on smallest screens */}
-          <Button size="icon" variant="ghost" asChild className="relative hidden sm:flex">
-            <Link to="/my/messages">
-              <MessageCircleIcon className="size-4" />
-              {hasMessages && (
-                <div className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
-              )}
-            </Link>
-          </Button>
-          
           {/* User Dropdown - Desktop */}
           <div className="hidden lg:block">
             <DropdownMenu>
@@ -221,21 +208,6 @@ export default function Navigation({
                     <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                   </div>
                 </div>
-
-                {/* Messages Link - Mobile */}
-                <Link
-                  to="/my/messages"
-                  className="flex items-center justify-between p-3 rounded-md hover:bg-accent relative"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <div className="flex items-center gap-3">
-                    <MessageCircleIcon className="size-5" />
-                    <span>메시지</span>
-                  </div>
-                  {hasMessages && (
-                    <div className="size-2 bg-red-500 rounded-full" />
-                  )}
-                </Link>
 
                 <Separator />
 
