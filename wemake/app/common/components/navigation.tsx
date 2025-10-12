@@ -30,7 +30,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   BarChart3Icon,
-  BellIcon,
   LogOutIcon,
   SettingsIcon,
   UserIcon,
