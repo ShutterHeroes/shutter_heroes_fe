@@ -110,11 +110,18 @@ export default function SubmitSightingPage() {
               onClear={handleClear}
               disabled={isSubmitting}
             />
-            <p className="text-sm text-gray-500 mt-2">
-              사진을 선택하면 자동으로 AI가 동물을 인식하고 출동 기록이 생성됩니다.
-              <br />
-              제목과 설명은 나중에 수정할 수 있습니다.
-            </p>
+            <div className="mt-4 space-y-2">
+              <p className="text-sm text-gray-500">
+                사진을 선택하면 자동으로 AI가 동물을 인식하고 출동 기록이 생성됩니다.
+                <br />
+                제목과 설명은 나중에 수정할 수 있습니다.
+              </p>
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>안내:</strong> 업로드되는 사진은 AI 학습에 사용될 수 있습니다.
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
