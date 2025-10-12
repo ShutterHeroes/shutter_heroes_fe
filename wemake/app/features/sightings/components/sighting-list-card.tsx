@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent } from '~/common/components/ui/card';
 import { Badge } from '~/common/components/ui/badge';
 import type { SightingListItem } from '~/lib/types/sighting.types';
+import { formatToKstDate } from '~/lib/utils/date.utils';
 import {
   CalendarIcon,
   EyeIcon,
@@ -12,6 +13,7 @@ import {
   AlertTriangleIcon,
   UserIcon,
   ImageOff,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface SightingListCardProps {
@@ -20,12 +22,15 @@ interface SightingListCardProps {
 
 export function SightingListCard({ sighting }: SightingListCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [isVisited, setIsVisited] = useState(false);
   const imageUrl = sighting.sanitizedUrl || sighting.storagePath;
-  const createdDate = new Date(sighting.createdAt).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const createdDate = formatToKstDate(sighting.createdAt);
+
+  useEffect(() => {
+    // 방문 여부 확인
+    const visitedSightings = JSON.parse(localStorage.getItem('visited-sightings') || '[]');
+    setIsVisited(visitedSightings.includes(String(sighting.id)));
+  }, [sighting.id]);
 
   return (
     <Link to={`/sightings/${sighting.id}`}>
@@ -48,6 +53,13 @@ export function SightingListCard({ sighting }: SightingListCardProps) {
 
           {/* 상단 우측 배지들 */}
           <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+            {/* 방문 여부 */}
+            {isVisited && (
+              <Badge variant="secondary" className="bg-gray-700 text-white">
+                <CheckCircle2 className="w-3 h-3 mr-1" /> 확인함
+              </Badge>
+            )}
+
             {/* 공개 여부 */}
             <Badge variant={sighting.visibility === 'public' ? 'default' : 'secondary'}>
               {sighting.visibility === 'public' ? (

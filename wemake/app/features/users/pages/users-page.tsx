@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui
 import { Avatar } from '~/common/components/ui/avatar';
 import { Button } from '~/common/components/ui/button';
 import { Input } from '~/common/components/ui/input';
+import { formatToKstShortDate } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '사용자 목록 | 셔터 히어로즈' }];
@@ -83,7 +84,7 @@ export default function UsersPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-xs text-gray-400">
-                      가입일: {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+                      가입일: {formatToKstShortDate(user.createdAt)}
                     </p>
                   </CardContent>
                 </Card>

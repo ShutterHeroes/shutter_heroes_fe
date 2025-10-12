@@ -16,7 +16,7 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 정보 등록 | 셔터 히어로즈' }];
+  return [{ title: '관찰 정보 등록 | 셔터 히어로즈' }];
 };
 
 export default function SubmitSightingPage() {
@@ -49,11 +49,11 @@ export default function SubmitSightingPage() {
         image: file,
       });
 
-      // 생성된 목격 정보 페이지로 이동
+      // 생성된 관찰 정보 페이지로 이동
       navigate(`/sightings/${sightingResult.sightingId}`);
     } catch (err: any) {
-      console.error('목격 정보 등록 에러:', err);
-      setError(err.response?.data?.message || '목격 정보 등록에 실패했습니다');
+      console.error('출동 기록 등록 에러:', err);
+      setError(err.response?.data?.message || '출동 기록 등록에 실패했습니다');
       setIsSubmitting(false);
     }
   };
@@ -79,7 +79,7 @@ export default function SubmitSightingPage() {
           <DialogHeader>
             <DialogTitle>로그인이 필요합니다</DialogTitle>
             <DialogDescription>
-              목격 정보를 등록하려면 로그인이 필요합니다.
+              출동 기록을 등록하려면 로그인이 필요합니다.
               <br />
               로그인 페이지로 이동하시겠습니까?
             </DialogDescription>
@@ -96,7 +96,7 @@ export default function SubmitSightingPage() {
       </Dialog>
 
       <div className="container mx-auto max-w-4xl space-y-6 py-8">
-        <h1 className="text-3xl font-bold">동물 목격 정보 등록</h1>
+        <h1 className="text-3xl font-bold">출동 기록 등록</h1>
 
         {/* 이미지 업로드 */}
         <Card>
@@ -111,7 +111,7 @@ export default function SubmitSightingPage() {
               disabled={isSubmitting}
             />
             <p className="text-sm text-gray-500 mt-2">
-              사진을 선택하면 자동으로 AI가 동물을 인식하고 목격 정보가 생성됩니다.
+              사진을 선택하면 자동으로 AI가 동물을 인식하고 출동 기록이 생성됩니다.
               <br />
               제목과 설명은 나중에 수정할 수 있습니다.
             </p>
@@ -129,7 +129,7 @@ export default function SubmitSightingPage() {
         {isSubmitting && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-8 h-8 animate-spin text-gray-500 mr-2" />
-            <span className="text-gray-600">목격 정보를 생성하는 중...</span>
+            <span className="text-gray-600">출동 기록을 생성하는 중...</span>
           </div>
         )}
       </div>

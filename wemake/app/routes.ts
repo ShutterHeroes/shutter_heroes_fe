@@ -15,7 +15,7 @@ export default [
     route("/join", "features/auth/pages/join-page.tsx"),
   ]),
 
-  // 목격 정보
+  // 관찰 정보
   ...prefix("/sightings", [
     index("features/sightings/pages/sightings-page.tsx"),
     route("/submit", "features/sightings/pages/submit-sighting-page.tsx"),

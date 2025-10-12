@@ -18,8 +18,8 @@ export function useAllSightings() {
       const response = await sightingsApi.getAll(params);
       setSightings(response);
     } catch (err: any) {
-      setError(err.response?.data?.message || '목격 정보 목록을 불러오는데 실패했습니다');
-      console.error('목격 정보 목록 조회 에러:', err);
+      setError(err.response?.data?.message || '출동 기록 목록을 불러오는데 실패했습니다');
+      console.error('출동 기록 목록 조회 에러:', err);
     } finally {
       setIsLoading(false);
     }

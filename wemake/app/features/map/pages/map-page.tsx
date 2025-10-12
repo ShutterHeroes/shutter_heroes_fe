@@ -15,9 +15,10 @@ import { SearchIcon, Loader2Icon, XIcon, MapIcon, ImageOff, Navigation, Circle }
 import type { SightingListItem } from '~/lib/types/sighting.types';
 import { parseWKTPoint, DEFAULT_MAP_CENTER } from '~/lib/utils/geo.utils';
 import { sightingsApi } from '~/lib/api/sightings.api';
+import { formatToKstDate, formatToKstDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 지도 | 셔터 히어로즈' }];
+  return [{ title: '관찰 지도 | 셔터 히어로즈' }];
 };
 
 // 줌 레벨에 따른 반경 계산 (meters) - 3배 이상 증가
@@ -110,7 +111,7 @@ export default function MapPage() {
       }
     } catch (err: any) {
       console.error('Error fetching nearby sightings:', err);
-      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다');
+      setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다');
       setSightings([]);
       setTotalCount(0);
     } finally {
@@ -176,7 +177,7 @@ export default function MapPage() {
     setImageError(false); // 새 모달 열 때 이미지 에러 상태 초기화
   };
 
-  // 위치 정보가 있는 목격 정보만 필터링
+  // 위치 정보가 있는 관찰 정보만 필터링
   const sightingsWithLocation = sightings.filter((s) => {
     const position = parseWKTPoint(s.geom);
     return position !== null;
@@ -200,7 +201,7 @@ export default function MapPage() {
       {/* 헤더 */}
       <div className="flex items-center gap-3">
         <MapIcon className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold">목격 지도</h1>
+        <h1 className="text-3xl font-bold">관찰 지도</h1>
       </div>
 
       {/* 통계 정보 및 재검색 버튼 */}
@@ -280,7 +281,7 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* 지도 - 목격 정보가 없어도 항상 표시 */}
+      {/* 지도 - 관찰 정보가 없어도 항상 표시 */}
       <div className="space-y-4">
         <SightingMap
           sightings={sightingsWithLocation}
@@ -297,14 +298,14 @@ export default function MapPage() {
         {sightingsWithLocation.length === 0 && !isLoading && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
             <p className="text-yellow-800 text-sm">
-              현재 위치(반경 {formatRadius(getRadiusFromZoom(mapZoom))})에 목격 정보가 없습니다.
+              현재 위치(반경 {formatRadius(getRadiusFromZoom(mapZoom))})에 출동 기록이 없습니다.
               지도를 이동하거나 축소해보세요.
             </p>
           </div>
         )}
       </div>
 
-      {/* 선택된 목격 정보 상세 - 모달 */}
+      {/* 선택된 관찰 정보 상세 - 모달 */}
       {selectedSighting && (
         <Dialog open={true} onOpenChange={(open) => !open && setSelectedSighting(null)}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -400,18 +401,12 @@ export default function MapPage() {
                   <p className="font-medium text-gray-800">{selectedSighting.displayName}</p>
                 </div>
 
-                {/* 목격 일시 */}
+                {/* 관찰 일시 */}
                 {selectedSighting.occurredAt && (
                   <div>
-                    <span className="text-xs text-gray-500">목격 일시</span>
+                    <span className="text-xs text-gray-500">관찰 일시</span>
                     <p className="font-medium text-gray-800">
-                      {new Date(selectedSighting.occurredAt).toLocaleString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatToKstDateTime(selectedSighting.occurredAt)}
                     </p>
                   </div>
                 )}
@@ -420,11 +415,7 @@ export default function MapPage() {
                 <div>
                   <span className="text-xs text-gray-500">등록일</span>
                   <p className="text-sm text-gray-700">
-                    {new Date(selectedSighting.createdAt).toLocaleDateString('ko-KR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                    {formatToKstDate(selectedSighting.createdAt)}
                   </p>
                 </div>
 
@@ -433,11 +424,7 @@ export default function MapPage() {
                   <div>
                     <span className="text-xs text-gray-500">최종 수정</span>
                     <p className="text-sm text-gray-700">
-                      {new Date(selectedSighting.updatedAt).toLocaleDateString('ko-KR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {formatToKstDate(selectedSighting.updatedAt)}
                     </p>
                   </div>
                 )}

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { type MetaFunction } from 'react-router';
+import { type MetaFunction, useLocation } from 'react-router';
 import { SightingListCard } from '../components/sighting-list-card';
 import { Button } from '~/common/components/ui/button';
 import { Input } from '~/common/components/ui/input';
@@ -8,10 +8,11 @@ import { sightingsApi } from '~/lib/api/sightings.api';
 import type { SightingListItem } from '~/lib/types/sighting.types';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '동물 목격 정보 | 셔터 히어로즈' }];
+  return [{ title: '동물 관찰 정보 | 셔터 히어로즈' }];
 };
 
 export default function SightingsPage() {
+  const location = useLocation();
   const [sightings, setSightings] = useState<SightingListItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -22,6 +23,7 @@ export default function SightingsPage() {
   const [totalElements, setTotalElements] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const scrollPositionSaved = useRef(false);
 
   const loadSightings = useCallback(async (page: number, searchKeyword?: string) => {
     if (isLoading) return;
@@ -46,16 +48,68 @@ export default function SightingsPage() {
       setCurrentPage(page);
       setTotalElements(response.totalElements);
     } catch (err: any) {
-      console.error('목격 정보 조회 실패:', err);
-      setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+      console.error('출동 기록 조회 실패:', err);
+      setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
   }, [isLoading]);
 
+  // 초기 데이터 로드 및 상태 복원
   useEffect(() => {
-    loadSightings(0, keyword || undefined);
+    const savedState = sessionStorage.getItem('sightings-page-state');
+
+    if (savedState) {
+      try {
+        const { sightings: savedSightings, currentPage: savedPage, keyword: savedKeyword, searchInput: savedSearchInput } = JSON.parse(savedState);
+
+        // 저장된 상태 복원
+        setSightings(savedSightings);
+        setCurrentPage(savedPage);
+        setKeyword(savedKeyword || '');
+        setSearchInput(savedSearchInput || '');
+        setHasMore(true); // 무한 스크롤은 계속 가능하도록
+
+        sessionStorage.removeItem('sightings-page-state');
+      } catch (err) {
+        console.error('상태 복원 실패:', err);
+        loadSightings(0, keyword || undefined);
+      }
+    } else {
+      loadSightings(0, keyword || undefined);
+    }
   }, []);
+
+  // 스크롤 위치 복원
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem('sightings-scroll-position');
+
+    if (savedScrollPosition && !scrollPositionSaved.current && sightings.length > 0) {
+      // 스크롤 위치 복원은 데이터 로딩 후에 수행
+      const restoreScroll = () => {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+        scrollPositionSaved.current = true;
+        sessionStorage.removeItem('sightings-scroll-position');
+      };
+
+      // 데이터가 로드될 때까지 약간 지연
+      const timer = setTimeout(restoreScroll, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [sightings]);
+
+  // 컴포넌트 언마운트 시 스크롤 위치 및 상태 저장
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem('sightings-scroll-position', window.scrollY.toString());
+      sessionStorage.setItem('sightings-page-state', JSON.stringify({
+        sightings,
+        currentPage,
+        keyword,
+        searchInput,
+      }));
+    };
+  }, [sightings, currentPage, keyword, searchInput]);
 
   useEffect(() => {
     if (!hasMore || isLoading) return;
@@ -124,7 +178,7 @@ export default function SightingsPage() {
     <div className="container mx-auto px-4 md:px-8 lg:px-20 space-y-6">
       {/* 헤더 및 검색 */}
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold">동물 목격 정보</h1>
+        <h1 className="text-3xl font-bold">출동 기록</h1>
 
         {/* 검색 바 */}
         <div className="flex gap-2">
@@ -187,14 +241,14 @@ export default function SightingsPage() {
 
           {!hasMore && sightings.length > 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500">모든 목격 정보를 불러왔습니다.</p>
+              <p className="text-gray-500">모든 출동 기록을 불러왔습니다.</p>
             </div>
           )}
         </>
       ) : !isLoading ? (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
-            {keyword ? '검색 결과가 없습니다.' : '등록된 목격 정보가 없습니다.'}
+            {keyword ? '검색 결과가 없습니다.' : '등록된 출동 기록이 없습니다.'}
           </p>
           {keyword && (
             <Button variant="outline" onClick={handleClearSearch} className="mt-4">

@@ -3,6 +3,7 @@ import { useUserProfile } from '../hooks/use-user-profile';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
 import { Avatar } from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
+import { formatToKstDate } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '사용자 프로필 | 셔터 히어로즈' }];
@@ -56,17 +57,13 @@ export default function UserProfilePage() {
           <div>
             <p className="text-sm text-gray-500">가입일</p>
             <p className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatToKstDate(user.createdAt)}
             </p>
           </div>
 
-          {/* TODO: Phase 3에서 사용자의 목격 정보 목록 추가 */}
+          {/* TODO: Phase 3에서 사용자의 관찰 정보 목록 추가 */}
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">이 사용자의 목격 정보는 곧 추가될 예정입니다.</p>
+            <p className="text-sm text-gray-500">이 사용자의 출동 기록은 곧 추가될 예정입니다.</p>
           </div>
         </CardContent>
       </Card>

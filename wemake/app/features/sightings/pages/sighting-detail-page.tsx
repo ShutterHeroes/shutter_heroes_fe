@@ -33,9 +33,10 @@ import {
 } from 'lucide-react';
 import { parseWKTPoint } from '~/lib/utils/geo.utils';
 import { useAuth } from '~/lib/hooks/use-auth';
+import { formatToKstDateTime, formatToKstLongDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 정보 상세 | 셔터 히어로즈' }];
+  return [{ title: '관찰 정보 상세 | 셔터 히어로즈' }];
 };
 
 export default function SightingDetailPage() {
@@ -60,9 +61,16 @@ export default function SightingDetailPage() {
       try {
         const data = await sightingsApi.getById(sightingId);
         setSighting(data);
+
+        // 방문 기록 저장
+        const visitedSightings = JSON.parse(localStorage.getItem('visited-sightings') || '[]');
+        if (!visitedSightings.includes(sightingId)) {
+          visitedSightings.push(sightingId);
+          localStorage.setItem('visited-sightings', JSON.stringify(visitedSightings));
+        }
       } catch (err: any) {
         console.error('Sighting 조회 에러:', err);
-        setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+        setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -80,7 +88,7 @@ export default function SightingDetailPage() {
       navigate('/my/sightings');
     } catch (err: any) {
       console.error('Sighting 삭제 에러:', err);
-      setError(err.response?.data?.message || '목격 정보 삭제에 실패했습니다.');
+      setError(err.response?.data?.message || '출동 기록 삭제에 실패했습니다.');
       setShowDeleteDialog(false);
     } finally {
       setIsDeleting(false);
@@ -104,7 +112,7 @@ export default function SightingDetailPage() {
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || '목격 정보를 찾을 수 없습니다.'}</p>
+            <p className="text-red-600 mb-4">{error || '출동 기록을 찾을 수 없습니다.'}</p>
             <Button onClick={() => navigate('/sightings')}>목록으로 돌아가기</Button>
           </CardContent>
         </Card>
@@ -121,9 +129,9 @@ export default function SightingDetailPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>목격 정보 삭제</DialogTitle>
+            <DialogTitle>출동 기록 삭제</DialogTitle>
             <DialogDescription>
-              정말로 이 목격 정보를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+              정말로 이 출동 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -165,7 +173,7 @@ export default function SightingDetailPage() {
           <h1 className="text-3xl font-bold mb-2">{sighting.title}</h1>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>{new Date(sighting.createdAt).toLocaleString('ko-KR')}</span>
+            <span>{formatToKstDateTime(sighting.createdAt)}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -355,25 +363,18 @@ export default function SightingDetailPage() {
         </Card>
       )}
 
-      {/* 목격 일시 */}
+      {/* 관찰 일시 */}
       {sighting.occurredAt && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-green-600" />
-              목격 일시
+              관찰 일시
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-medium">
-              {new Date(sighting.occurredAt).toLocaleString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'short',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {formatToKstLongDateTime(sighting.occurredAt)}
             </p>
           </CardContent>
         </Card>
@@ -425,25 +426,13 @@ export default function SightingDetailPage() {
             <div>
               <span className="text-sm text-gray-600">등록일</span>
               <p className="text-sm font-medium">
-                {new Date(sighting.createdAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(sighting.createdAt)}
               </p>
             </div>
             <div>
               <span className="text-sm text-gray-600">최종 수정</span>
               <p className="text-sm font-medium">
-                {new Date(sighting.updatedAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(sighting.updatedAt)}
               </p>
             </div>
           </div>

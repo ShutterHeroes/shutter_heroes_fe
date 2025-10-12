@@ -14,7 +14,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '~/lib/hooks/use-auth';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '목격 정보 수정 | 셔터 히어로즈' }];
+  return [{ title: '출동 기록 수정 | 셔터 히어로즈' }];
 };
 
 const editSchema = z.object({
@@ -74,7 +74,7 @@ export default function EditSightingPage() {
         });
       } catch (err: any) {
         console.error('Sighting 조회 에러:', err);
-        setError(err.response?.data?.message || '목격 정보를 불러오는데 실패했습니다.');
+        setError(err.response?.data?.message || '출동 기록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -101,8 +101,8 @@ export default function EditSightingPage() {
       // 수정 성공 시 상세 페이지로 이동
       navigate(`/sightings/${sightingId}`);
     } catch (err: any) {
-      setError(err.response?.data?.message || '목격 정보 수정에 실패했습니다.');
-      console.error('목격 정보 수정 에러:', err);
+      setError(err.response?.data?.message || '출동 기록 수정에 실패했습니다.');
+      console.error('출동 기록 수정 에러:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -123,7 +123,7 @@ export default function EditSightingPage() {
       <div className="container mx-auto max-w-4xl py-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <p className="text-red-600 mb-4">{error || '목격 정보를 찾을 수 없습니다.'}</p>
+            <p className="text-red-600 mb-4">{error || '출동 기록을 찾을 수 없습니다.'}</p>
             <Button onClick={() => navigate('/sightings')}>목록으로 돌아가기</Button>
           </CardContent>
         </Card>
@@ -139,7 +139,7 @@ export default function EditSightingPage() {
         상세 페이지로
       </Button>
 
-      <h1 className="text-3xl font-bold">목격 정보 수정</h1>
+      <h1 className="text-3xl font-bold">출동 기록 수정</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* 제목 및 설명 */}
@@ -153,7 +153,7 @@ export default function EditSightingPage() {
               <Input
                 id="title"
                 type="text"
-                placeholder="목격 정보 제목을 입력하세요"
+                placeholder="출동 기록 제목을 입력하세요"
                 {...register('title')}
               />
               {errors.title && (
@@ -165,7 +165,7 @@ export default function EditSightingPage() {
               <Label htmlFor="description">설명 (선택)</Label>
               <Textarea
                 id="description"
-                placeholder="목격 상황, 위치 등을 상세히 적어주세요"
+                placeholder="관찰 상황, 위치 등을 상세히 적어주세요"
                 rows={4}
                 {...register('description')}
               />

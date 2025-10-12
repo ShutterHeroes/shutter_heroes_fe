@@ -7,6 +7,7 @@ import { Button } from '~/common/components/ui/button';
 import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
 import { sightingsApi } from '~/lib/api/sightings.api';
+import { formatToKstDate, formatToKstDateTime } from '~/lib/utils/date.utils';
 
 export const meta: MetaFunction = () => {
   return [{ title: '내 프로필 | 셔터 히어로즈' }];
@@ -24,7 +25,7 @@ export default function MyProfilePage() {
         const response = await sightingsApi.getMySightings({ page: 0, size: 1 });
         setSightingsCount(response.totalElements);
       } catch (error) {
-        console.error('목격 정보 개수 조회 실패:', error);
+        console.error('출동 기록 개수 조회 실패:', error);
       }
     };
 
@@ -82,11 +83,7 @@ export default function MyProfilePage() {
           <div>
             <p className="text-sm text-gray-500">가입일</p>
             <p className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatToKstDate(user.createdAt)}
             </p>
           </div>
 
@@ -94,19 +91,13 @@ export default function MyProfilePage() {
             <div>
               <p className="text-sm text-gray-500">마지막 로그인</p>
               <p className="font-medium">
-                {new Date(user.lastLoginAt).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatToKstDateTime(user.lastLoginAt)}
               </p>
             </div>
           )}
 
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500">내 목격 정보</p>
+            <p className="text-sm text-gray-500">내 출동 기록</p>
             <div className="flex items-center justify-between mt-2">
               <p className="text-2xl font-bold">
                 {sightingsCount !== null ? `${sightingsCount}건` : '로딩 중...'}

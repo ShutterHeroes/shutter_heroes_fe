@@ -44,7 +44,7 @@ import { useAuth } from "~/lib/hooks/use-auth";
 
 const menus = [
   {
-    name: "목격 정보",
+    name: "출동 기록",
     to: "/sightings",
   },
   {
@@ -78,8 +78,9 @@ export default function Navigation({
   return (
     <nav className="flex px-4 md:px-8 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50 border-b">
       <div className="flex items-center gap-2 md:gap-4">
-        <Link to="/" className="font-bold tracking-tighter text-base md:text-lg">
-          셔터 히어로즈
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/logo_3.png" alt="셔터 히어로즈 로고" className="h-8 w-auto" />
+          <span className="font-bold tracking-tighter text-base md:text-lg">셔터 히어로즈</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -172,7 +173,7 @@ export default function Navigation({
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/my/sightings">
                       <BarChart3Icon className="size-4 mr-2" />
-                      내 목격 정보
+                      내 출동 기록
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -286,7 +287,7 @@ export default function Navigation({
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <BarChart3Icon className="size-5" />
-                    <span>내 목격 정보</span>
+                    <span>내 출동 기록</span>
                   </Link>
                   <Link
                     to="/my/profile"
